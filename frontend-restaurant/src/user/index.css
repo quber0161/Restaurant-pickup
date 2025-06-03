@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Roboto:ital@1&display=swap');
+*{
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: Outfit;
+  scroll-behavior: smooth;
+}
+body{
+  min-height: 100vh;
+}
+
+a{
+  text-decoration: non;
+  color: inherit;
+}
+
+
+
+/* Makes the full page take 100% height */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Layout structure */
+.page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* full viewport height */
+  width: 80%;
+  margin: auto;
+}
+
+/* Content grows to fill remaining space */
+.content-wrap {
+  flex: 1;
+}
+
+@keyframes fadeIn {
+  0%{
+    opacity: 0;
+  }  
+  100%{
+    opacity: 1;
+  }
+}

@@ -1,0 +1,112 @@
+.add{
+    width: 70%;
+    margin-left: max(5vw,25px);
+    margin-top: 50px;
+    color: #6d6d6d;
+    font-size: 16px;
+}
+
+.add form{
+    gap: 20px;
+}
+
+.add-img-upload img{
+    width: 120px;
+    cursor: pointer;
+}
+
+.add-product-name, .add-product-description{
+    width: max(40%,280px);
+}
+
+.add-product-name input, .add-product-description textarea{
+    padding: 10px;
+}
+
+.add-category-price{
+    display: flex;
+    gap: 30px;
+}
+
+.add-category-price select, .add-category-price input{
+    max-width: 120px;
+    padding: 10px;
+}
+
+.add-button{
+    max-width: 120px;
+    border: none;
+    padding: 10px;
+    background-color: rgb(226, 62, 62);
+    color: white;
+    cursor: pointer;
+}
+
+/* 🟢 Extra Ingredients Section */
+.add-extras {
+    margin-top: 15px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.extras-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.extra-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.extra-item input {
+    transform: scale(1.2);
+}
+
+.add-mandatory-options {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+  
+  .mandatory-form input {
+    padding: 8px;
+    margin-bottom: 10px;
+    width: 60%;
+  }
+  
+  .choices-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .current-choices {
+    margin: 10px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .choice-item {
+    background-color: #eee;
+    padding: 5px 10px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .saved-options {
+    margin-top: 10px;
+  }
+  

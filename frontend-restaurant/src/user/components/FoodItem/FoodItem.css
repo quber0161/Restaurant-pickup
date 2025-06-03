@@ -1,0 +1,335 @@
+.food-item {
+    width: 100%;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 15px;
+    box-shadow: 0px 0px 10px rgba(78, 78, 78, 0.671);
+    transition: 0.3s;
+    animation: fadeIn 1s;
+}
+
+.food-item-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover; 
+    border-radius: 15px 15px 0px 0px;
+}
+
+.food-item-info {
+    padding: 20px;
+}
+
+.food-item-name-rating {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.food-item-name-rating p {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.food-item-name-rating img {
+    width: 70px;
+}
+
+.food-item-description {
+    color: #505050;
+    font-size: 12px;
+}
+
+.food-item-price {
+    color: tomato;
+    font-size: 22px;
+    font-weight: 500;
+    margin: 10px 0px;
+}
+
+.food-item-image-container{
+    position: relative;
+}
+
+.addicon{
+    width: 35px;
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.food-item-counter{
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px;
+    border-radius: 50px;
+    background-color: aliceblue;
+}
+
+.food-item-counter img{
+    width: 30px;
+}
+
+/* Popup Styling */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.popup {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.popup h3 {
+    margin-bottom: 10px;
+    font-size: 20px;
+    color: #333;
+}
+
+/* Extra Ingredient Section */
+.extra-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 10px 0;
+    
+}
+
+.extra-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f9f9f9;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+.ex-p{
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 12px 0;
+    margin-top: 20px;
+    text-align: left;
+    font-size: 16px;
+    font-weight: 700;
+    color: #222;
+}
+
+.extra-item p {
+    font-size: 14px;
+    font-weight: 400;
+    margin: 0;
+    color: #333;
+    
+}
+
+/* Extra Ingredient Quantity Controls */
+.extra-quantity {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.extra-quantity button {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    width: 24px;
+    height: 24px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.extra-quantity button:hover {
+    background-color: #e60000;
+}
+
+.extra-quantity span {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    min-width: 20px;
+    text-align: center;
+}
+
+/* Special Instructions */
+textarea {
+    width: 100%;
+    height: 60px;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 14px;
+}
+
+/* Popup Buttons */
+.popup-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.popup-buttons button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.popup-buttons button:first-child {
+    background: #ccc;
+    color: #333;
+}
+
+.popup-buttons button:first-child:hover {
+    background: #bbb;
+}
+
+.popup-buttons button:last-child {
+    background: #ff4d4d;
+    color: white;
+}
+
+.popup-buttons button:last-child:hover {
+    background: #e60000;
+}
+
+
+.food-item-image-container.sold-out {
+    position: relative;
+    filter: grayscale(100%) brightness(70%);
+    cursor: not-allowed;
+  }
+  
+  .sold-out-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 15px 15px 0 0;
+    pointer-events: none; /* So it doesn't block clicks */
+  }
+  
+  .quantity-selector {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+  }
+  
+  .quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .quantity-controls button {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    width: 28px;
+    height: 28px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .quantity-controls span {
+    font-size: 16px;
+    font-weight: bold;
+    min-width: 20px;
+    text-align: center;
+  }
+  
+
+/* 🔷 Mandatory Options */
+.mandatory-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 12px 0;
+    text-align: left;
+  }
+  
+  .mandatory-options p {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #222;
+  }
+  
+  .mandatory-group {
+    background: #f9f9f9;
+    padding: 10px 12px;
+    border-radius: 6px;
+  }
+  
+  .mandatory-group > p {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #222;
+  }
+  
+  .mandatory-choices {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .mandatory-choices label {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 14px;
+    font-weight: 400;
+    color: #333;
+    cursor: pointer;
+  }
+  
+  .mandatory-choices input[type="radio"] {
+    accent-color: #ff4d4d;
+    cursor: pointer;
+  }
+  
+  .mandatory-choices label:hover {
+    background: #ffcfc4;
+    border-radius: 4px;
+  }
+  
