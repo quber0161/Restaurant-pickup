@@ -6,24 +6,32 @@ import FoodDisplay from "../../components/FoodDisplay/FoodDisplay";
 
 const MenuPage = () => {
   const [category, setCategory] = useState("All");
-  const [isStoreOpen, setIsStoreOpen] = useState(true);
+  const [storeStatus, setStoreStatus] = useState({
+    isOpen: false,
+    isOrderAllowed: false,
+    isPreOrderTime: false,
+  });
 
   useEffect(() => {
     fetch("http://localhost:4000/api/store-hours/store-status")
       .then(res => res.json())
-      .then(data => setIsStoreOpen(data.isOpen))
+      .then(data => setStoreStatus(data))
       .catch(err => console.error("Failed to fetch store status", err));
   }, []);
 
+  const { isOpen, isOrderAllowed, isPreOrderTime } = storeStatus;
+
   return (
     <div className="menu-page">
-      {!isStoreOpen && (
+      {!isOrderAllowed && (
         <div className="store-closed-banner">
-          The store is currently closed. You can browse the menu but ordering is disabled.
+          {isPreOrderTime
+            ? "The store is currently closed, but you can place a pre-order now."
+            : "TThe Restaurant is currently closed. You can browse the menu but ordering is disabled."}
         </div>
       )}
       <Menu category={category} setCategory={setCategory} />
-      <FoodDisplay category={category} />
+      <FoodDisplay category={category} isOrderAllowed={isOrderAllowed || isPreOrderTime} />
     </div>
   );
 };

@@ -25,9 +25,7 @@ const GuestTrack = () => {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:4000/api/order/track/${token}`
-        );
+        const res = await axios.get(`http://localhost:4000/api/order/track/${token}`);
         if (res.data.success) {
           setOrder(res.data.order);
         } else {
@@ -43,56 +41,66 @@ const GuestTrack = () => {
     fetchOrder();
   }, [token]);
 
-  if (loading) return <div className="guest-track">Loading...</div>;
-  if (!order) return <div className="guest-track">No order found.</div>;
+  if (loading) return <div className="guest-track"><h3>Loading...</h3></div>;
+  if (!order) return <div className="guest-track"><h3>No order found.</h3></div>;
 
   return (
-    <div
-      className="guest-track"
-      style={{
-        backgroundColor: getStatusBackgroundColor(order.status),
-        padding: "20px",
-        borderRadius: "10px",
-      }}
-    >
-      <h2>Track Your Order</h2>
+    <div className="guest-track">
+      <h2>Guest Order Tracking</h2>
+      <div
+        className="guest-order"
+        style={{ backgroundColor: getStatusBackgroundColor(order.status) }}
+      >
+        <div className="order-details">
+          {order.items.map((item, idx) => (
+            <div key={idx} className="order-item">
+              <p>
+                <b>{item.name}</b> x {item.quantity}
+              </p>
 
-      <button className="track-btn" onClick={() => window.location.reload()}>
-        Track Status
-      </button>
+              {item.mandatoryOptions && Object.keys(item.mandatoryOptions).length > 0 && (
+                <p className="order-mandatory">
+                  <b>Options:</b>{" "}
+                  {Object.entries(item.mandatoryOptions).map(([key, value], i, arr) => (
+                    <span className="mandatory" key={i}>
+                      {key}: {value.label}
+                      {value.additionalPrice ? ` (+Kr ${value.additionalPrice})` : ""}
+                      {i < arr.length - 1 ? ", " : ""}
+                    </span>
+                  ))}
+                </p>
+              )}
 
-      <p>
-        <strong>Order Status:</strong> {order.status}
-      </p>
-      <p>
-        <strong>Total:</strong> Kr {order.amount}
-      </p>
-      <p>
-        <strong>Order Date:</strong> {new Date(order.date).toLocaleString()}
-      </p>
-      <h3>Items:</h3>
-      <ul>
-        {order.items.map((item, i) => (
-          <li key={i}>
-            {item.quantity}x {item.name} - Kr {item.price}
-            {item.extras?.length > 0 && (
-              <ul>
-              {item.extras.map((extra, idx) => {
-                const name = extra.name || "Extra";
-                const price = extra.price || 0;
-          
-                return (
-                  <li key={idx}>
-                    {name} x {extra.quantity || 1} (+Kr {price * (extra.quantity || 1)})
-                  </li>
-                );
-              })}
-            </ul>
-            )}
-            {item.comment && <p>Note: {item.comment}</p>}
-          </li>
-        ))}
-      </ul>
+              {item.extras?.length > 0 && (
+                <p className="order-extras">
+                  <b>Extras:</b>{" "}
+                  {item.extras.map((extra, i) => (
+                    <span className="ex" key={i}>
+                      {extra.name} x {extra.quantity || 1}
+                      {i < item.extras.length - 1 ? ", " : ""}
+                    </span>
+                  ))}
+                </p>
+              )}
+
+              {item.comment && (
+                <p className="order-comment">
+                  <b>Note:</b> {item.comment}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <p><b>Total:</b> Kr {order.amount}.00</p>
+        <p><b>Items:</b> {order.items.length}</p>
+        <p>
+          <span>&#x25cf;</span>{" "}
+          <span className="status-pill">{order.status}</span>
+        </p>
+
+        <button className="gu-bt" onClick={() => window.location.reload()}>Track Order</button>
+      </div>
     </div>
   );
 };

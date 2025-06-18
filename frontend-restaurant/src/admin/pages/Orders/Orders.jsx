@@ -10,8 +10,6 @@ import { toast, ToastContainer } from "react-toastify";
 import notifySound from "../../assets/notify.wav";
 import { findPrinters, printOrder } from "../../utils/qzPrinter";
 
-
-
 // eslint-disable-next-line react/prop-types
 const Orders = ({ url }) => {
   const [orders, setOrders] = useState([]);
@@ -23,7 +21,9 @@ const Orders = ({ url }) => {
     try {
       const response = await axios.get(url + "/api/order/list");
       if (response.data.success) {
-        const paidOrders = response.data.data.filter(order => order.payment === true);
+        const paidOrders = response.data.data.filter(
+          (order) => order.payment === true
+        );
         setOrders(paidOrders);
       } else {
         toast.error("Error fetching orders");
@@ -35,22 +35,21 @@ const Orders = ({ url }) => {
 
   useEffect(() => {
     fetchAllOrders();
-  
+
     // Polling (optional)
     const interval = setInterval(fetchAllOrders, 5000);
-  
+
     // Real-time listener via socket
     const socket = io(url); // adjust to match your backend address
-  
-    socket.on("newOrder", async (newOrder) => {
 
+    socket.on("newOrder", async (newOrder) => {
       // 🎵 Play notification sound
       const audio = new Audio(notifySound);
       audio.play();
-  
+
       // 🔔 Toastify notification
       toast.success(`New order received!`);
-  
+
       // 📦 Add new order to top of list
       setOrders((prev) => [newOrder, ...prev]);
 
@@ -60,10 +59,8 @@ const Orders = ({ url }) => {
       // // You can fetch printer names using
       // const printers = await findPrinters();
       // console.log(printers); // choose from list
-      
-
     });
-  
+
     return () => {
       clearInterval(interval);
       socket.disconnect();
@@ -71,8 +68,6 @@ const Orders = ({ url }) => {
   }, []);
 
   //
-
-  
 
   // Change order status
   const statusHandler = async (event, orderId) => {
@@ -153,47 +148,74 @@ const Orders = ({ url }) => {
       <div className="order-list">
         {paginatedOrders.map((order, index) =>
           order.isDateHeader ? (
-            <h4 key={index} className="order-date">{order.date}</h4>
+            <h4 key={index} className="order-date">
+              {order.date}
+            </h4>
           ) : (
             <div
               key={index}
               className="order-item"
-              style={{ backgroundColor: getStatusBackgroundColor(order.status) }}
+              style={{
+                backgroundColor: getStatusBackgroundColor(order.status),
+              }}
             >
               <img src={assets.parcel_icon} alt="Parcel" />
-              
+
               <div className="order-details">
-                <p><b>Customer:</b> {order.address.firstName} {order.address.lastName}</p>
-                <p><b>Address:</b> {order.address.houseNo}, {order.address.street}, {order.address.zipCode}</p>
-                <p><b>Phone:</b> {order.address.phone}</p>
-                <p><b>Total Items:</b> {order.items.length}</p>
-                <p><b>Total Amount:</b> Kr {order.amount}.00</p>
+                <p>
+                  <b>Customer:</b> {order.address.firstName}{" "}
+                  {order.address.lastName}
+                </p>
+                <p>
+                  <b>Address:</b> {order.address.houseNo},{" "}
+                  {order.address.street}, {order.address.zipCode}
+                </p>
+                <p>
+                  <b>Phone:</b> {order.address.phone}
+                </p>
+                <p>
+                  <b>Total Items:</b> {order.items.length}
+                </p>
+                <p>
+                  <b>Total Amount:</b> Kr {order.amount}.00
+                </p>
 
                 {/* 🟢 Show Order Items with Extras */}
                 {order.items.map((item, idx) => (
                   <div key={idx} className="order-item-detail">
-                    <p><b>{item.name} x {item.quantity}</b></p>
-                    
-                    {/* ✅ Mandatory Options */}
-                    {item.mandatoryOptions && Object.keys(item.mandatoryOptions).length > 0 && (
-                      <p className="order-mandatory">
-                        <b>Options:</b>{" "}
-                        {Object.entries(item.mandatoryOptions)
-                          .map(([key, value]) => {
-                            const label = value?.label || "Unknown";
-                            const extra = value?.additionalPrice > 0 ? `(+Kr ${value.additionalPrice})` : "";
-                            return `${key}: ${label} ${extra}`.trim();
-                          })
-                          .join(", ")}
-                      </p>
-                    )}
+                    <p>
+                      <b>
+                        {item.name} x {item.quantity}
+                      </b>
+                    </p>
 
+                    {/* ✅ Mandatory Options */}
+                    {item.mandatoryOptions &&
+                      Object.keys(item.mandatoryOptions).length > 0 && (
+                        <p className="order-mandatory">
+                          <b>Options:</b>{" "}
+                          {Object.entries(item.mandatoryOptions)
+                            .map(([key, value]) => {
+                              const label = value?.label || "Unknown";
+                              const extra =
+                                value?.additionalPrice > 0
+                                  ? `(+Kr ${value.additionalPrice})`
+                                  : "";
+                              return `${key}: ${label} ${extra}`.trim();
+                            })
+                            .join(", ")}
+                        </p>
+                      )}
 
                     {/* Extras */}
-                    {item.extras.length > 0 && (
+                    {Array.isArray(item.extras) && item.extras.length > 0 && (
                       <p className="order-extras">
                         <b>Extras:</b>{" "}
-                        {item.extras.map((extra) => `${extra.name} x ${extra.quantity || 1}`).join(", ")}
+                        {item.extras
+                          .map(
+                            (extra) => `${extra.name} x ${extra.quantity || 1}`
+                          )
+                          .join(", ")}
                       </p>
                     )}
 
@@ -205,11 +227,12 @@ const Orders = ({ url }) => {
                     )}
                   </div>
                 ))}
-
-
               </div>
 
-              <select onChange={(event) => statusHandler(event, order._id)} value={order.status}>
+              <select
+                onChange={(event) => statusHandler(event, order._id)}
+                value={order.status}
+              >
                 <option value="Order Processing">Order Processing</option>
                 <option value="Ready to Takeaway">Ready to Takeaway</option>
                 <option value="Taken">Taken</option>
@@ -221,11 +244,17 @@ const Orders = ({ url }) => {
 
       {/* Pagination */}
       <div className="pagination">
-        <button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)}>
+        <button
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage(currentPage - 1)}
+        >
           Previous
         </button>
         <span>Page {currentPage}</span>
-        <button disabled={currentPage * ordersPerPage >= allOrders.length} onClick={() => setCurrentPage(currentPage + 1)}>
+        <button
+          disabled={currentPage * ordersPerPage >= allOrders.length}
+          onClick={() => setCurrentPage(currentPage + 1)}
+        >
           Next
         </button>
       </div>

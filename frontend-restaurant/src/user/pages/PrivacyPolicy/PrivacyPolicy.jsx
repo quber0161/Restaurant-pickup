@@ -7,7 +7,7 @@ const PrivacyPolicy = () => {
     <div className="privacy-container">
       <h1 className="text-3xl font-bold mb-4">Privacy Policy</h1>
       <p className="mb-4">
-        At <strong>Sandvika Kjøttsenter</strong>, we value your privacy and are committed to protecting your personal information.
+        At <strong>Restaurant</strong>, we value your privacy and are committed to protecting your personal information.
       </p>
       <h2 className="text-xl font-semibold mt-4 mb-2">Information We Collect</h2>
       <ul className="list-disc list-inside mb-4">

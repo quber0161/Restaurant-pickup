@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./Login.css";
 import { assets } from "../../assets/assets";
 import { StoreContext } from "../../context/StoreContext";
@@ -56,6 +56,15 @@ const onSubmitHandler = async (event) => {
     alert(response.data.message);
   }
 };
+
+
+useEffect(() => {
+  document.body.style.overflow = 'hidden';
+  return () => {
+    document.body.style.overflow = 'auto';
+  };
+}, []);
+
 
 return (
   <div className="login">

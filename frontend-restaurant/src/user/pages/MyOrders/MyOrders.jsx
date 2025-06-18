@@ -12,8 +12,6 @@ const MyOrders = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 3; // Number of orders per page
 
-  console.log("🔹 Orders Data:", data);
-
 
   // Fetch User Orders
   const fetchOrders = async () => {
@@ -37,7 +35,6 @@ const MyOrders = () => {
   
 
   useEffect(() => {
-    console.log("🔹 Token Used for API:", token); // ✅ Check if token exists
     if (token) {
       fetchOrders();
     }
@@ -69,7 +66,6 @@ const MyOrders = () => {
       (a, b) => new Date(b[0]) - new Date(a[0])
     );
   };
-  console.log("🔹 Grouped Orders:", groupOrdersByDate()); // Debugging
 
 
   // Flatten grouped orders into a single array for pagination

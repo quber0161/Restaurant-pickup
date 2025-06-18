@@ -1,11 +1,19 @@
-.login{
-    position: absolute;
-    z-index: 1;
-    width: 100%;
-    height: 100%;
+.login {
+    position: fixed; /* Change from absolute to fixed */
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    width: 100vw;
+    height: 100vh;
     background-color: #00000080;
-    display: grid;
+    
+    display: flex; /* Use flex to center */
+    justify-content: center;
+    align-items: center;
+
+    overflow: hidden; /* Prevent scrolling while modal is open */
 }
+
 
 .login-container{
     place-self: center;

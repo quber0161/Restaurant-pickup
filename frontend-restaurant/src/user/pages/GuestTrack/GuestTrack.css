@@ -1,82 +1,80 @@
 .guest-track {
-    max-width: 600px;
-    margin: 40px auto;
-    padding: 20px;
-    border-radius: 10px;
-    font-family: 'Segoe UI', sans-serif;
-    box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-    margin-top: 150px;
-  }
-  
-  .track-btn {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 16px;
+  padding: 20px;
+  max-width: 960px;
+  margin: auto;
+  margin-top: 120px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.guest-order {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  font-size: 14px;
+  padding: 20px;
+  color: #454545;
+  border: 1px solid tomato;
+  border-radius: 8px;
+}
+
+.order-details {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.order-item {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+
+.order-extras, .order-mandatory, .order-comment {
+  margin-left: 20px;
+  font-size: 14px;
+}
+
+.order-extras .ex,
+.order-mandatory .mandatory {
+  color: #000;
+}
+
+.order-comment {
+  color: #ff4d4d;
+  font-style: italic;
+}
+
+.status-pill {
+  font-weight: bold;
+  padding: 3px 8px;
+  border-radius: 8px;
+  background: #eee;
+  color: #000;
+  display: inline-block;
+}
+
+.gu-bt {
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  background-color: #ffe1e1;
+  color: #454545;
+  font-weight: 500;
+  cursor: pointer;
+  max-width: 200px;
+}
+
+@media (max-width: 768px) {
+  .guest-order {
+    padding: 15px;
     font-size: 14px;
-    border-radius: 6px;
-    cursor: pointer;
-    margin-bottom: 20px;
   }
-  
-  .track-btn:hover {
-    background-color: #0056b3;
+
+  .order-details {
+    gap: 10px;
   }
-  
-  
-  .track-container {
-    border: 1px solid #ddd;
-    padding: 30px;
-    border-radius: 8px;
-    background-color: #fff;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+
+  button {
+    font-size: 13px;
+    width: 100%;
   }
-  
-  .track-container h2 {
-    margin-bottom: 20px;
-    color: #333;
-  }
-  
-  .track-info p,
-  .customer-info p {
-    margin: 5px 0;
-  }
-  
-  .status {
-    padding: 2px 8px;
-    border-radius: 5px;
-    font-weight: bold;
-  }
-  
-  .status.Order-Processing {
-    background-color: #fff3cd;
-    color: #856404;
-  }
-  
-  .status.Ready-to-Takeaway {
-    background-color: #d1ecf1;
-    color: #0c5460;
-  }
-  
-  .status.Taken {
-    background-color: #d4edda;
-    color: #155724;
-  }
-  
-  .items-list {
-    margin-top: 20px;
-  }
-  
-  .items-list ul {
-    padding-left: 20px;
-  }
-  
-  .item {
-    margin-bottom: 15px;
-  }
-  
-  .extras {
-    font-size: 0.9rem;
-    color: #555;
-  }
-  
+}
