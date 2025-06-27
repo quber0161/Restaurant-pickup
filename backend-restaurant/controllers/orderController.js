@@ -230,7 +230,7 @@ export const createGuestStripeCheckout = async (req, res) => {
       });
     });
 
-    const frontend_url = "restaurant-pickup-psi.vercel.app"; // update to production if needed
+    const frontend_url = "https://restaurant-pickup-psi.vercel.app/"; // update to production if needed
 
     const session = await stripe.checkout.sessions.create({
       line_items,
@@ -272,7 +272,7 @@ const verifyOrder = async (req, res) => {
   
 
         if (guest && updatedOrder?.email && updatedOrder?.trackingToken) {
-          const trackingLink = `restaurant-pickup-psi.vercel.app/track-order/${updatedOrder.trackingToken}`;
+          const trackingLink = `https://restaurant-pickup-psi.vercel.app/track-order/${updatedOrder.trackingToken}`;
           await sendTrackingEmail(updatedOrder.email, trackingLink);
 
           return res.json({
