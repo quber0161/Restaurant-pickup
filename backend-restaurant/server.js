@@ -64,7 +64,7 @@ app.get("/", (req, res) => {
 
 // ✅ Use the HTTP server to listen instead of app.listen
 server.listen(port, () => {
-    console.log(`🚀 Server running atrestaurant-pickup-psi.vercel.app:${port}`)
+    console.log(`🚀 Server running at restaurant-pickup-psi.vercel.app:${port}`)
 })
 
 // mongodb+srv://dilushan06:<db_password>@cluster0.xbo2f.mongodb.net/?
