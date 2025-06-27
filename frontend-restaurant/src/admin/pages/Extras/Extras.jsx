@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 
 const Extras = () => {
     
-    const url = "http://localhost:4000";
+    const url = "https://restaurant-pickup-1.onrender.com";
   const [extras, setExtras] = useState([]);
   const [newExtra, setNewExtra] = useState({ name: "", price: "" });
 

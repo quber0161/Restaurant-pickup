@@ -13,7 +13,7 @@ import Extras from "./pages/Extras/Extras";
 import StoreHour from "./pages/StoreHour/StoreHour";
 
 const AdminApp = () => {
-  const url = "http://localhost:4000";
+  const url = "https://restaurant-pickup-1.onrender.com";
   const { token, userRole } = useContext(StoreContext);
   const navigate = useNavigate();
 

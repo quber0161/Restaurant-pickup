@@ -13,7 +13,7 @@ const MenuPage = () => {
   });
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/store-hours/store-status")
+    fetch("https://restaurant-pickup-1.onrender.com/api/store-hours/store-status")
       .then(res => res.json())
       .then(data => setStoreStatus(data))
       .catch(err => console.error("Failed to fetch store status", err));
