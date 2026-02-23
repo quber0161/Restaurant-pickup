@@ -19,7 +19,7 @@ const Footer = () => {
           <div className="footer-social-icons">
             {/* 🟢 Facebook Icon (Replace with your actual Facebook URL) */}
             <a
-              href="https://www.facebook.com/p/Shandizno-100078249963284/"
+              href="https://www.facebook.com"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -28,7 +28,7 @@ const Footer = () => {
 
             {/* 🟢 Instagram Icon (Replace with your actual Instagram URL) */}
             <a
-              href="https://www.instagram.com/shandiz.no/"
+              href="https://www.instagram.com"
               target="_blank"
               rel="noopener noreferrer"
             >
