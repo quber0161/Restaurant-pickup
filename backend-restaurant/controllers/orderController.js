@@ -1,6 +1,7 @@
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
 import extraModel from "../models/extraModel.js";
+import birdiebiteRestaurantModel from "../models/birdiebiteRestaurantModel.js";
 import Stripe from "stripe";
 import crypto from 'crypto';
 import sendEmail from "../utils/sendEmail.js";
@@ -8,9 +9,20 @@ import sendEmail from "../utils/sendEmail.js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
+const PRODUCTION_FRONTEND = "https://restaurant-pickup-psi.vercel.app";
+
+// Never use localhost for Stripe redirects - always redirect to production
+function getStripeRedirectUrl(returnUrl) {
+  const raw = (returnUrl || process.env.FRONTEND_URL || PRODUCTION_FRONTEND).replace(/\/$/, "");
+  if (/localhost|127\.0\.0\.1/i.test(raw)) {
+    return (process.env.FRONTEND_URL || PRODUCTION_FRONTEND).replace(/\/$/, "");
+  }
+  return raw;
+}
+
 //placing user order from front end
 const placeOrder = async (req, res) => {
-    const frontend_url = "https://restaurant-pickup-psi.vercel.app/";
+    const frontend_url = getStripeRedirectUrl(req.body.returnUrl);
 
     try {
         const userId = req.userId;
@@ -59,8 +71,15 @@ const placeOrder = async (req, res) => {
             return res.json({ success: false, message: "Invalid total amount" });
         }
 
+        let restaurantId = null;
+        if (req.body.restaurantSlug) {
+            const restaurant = await birdiebiteRestaurantModel.findOne({ slug: req.body.restaurantSlug });
+            if (restaurant) restaurantId = restaurant._id;
+        }
+
         const newOrder = new orderModel({
             userId: userId,
+            restaurantId,
             items: orderItems,
             amount: totalAmount,
             address: req.body.address,
@@ -135,10 +154,16 @@ const placeOrder = async (req, res) => {
 
 export const createGuestStripeCheckout = async (req, res) => {
   try {
-    const { items, amount, address, email, date } = req.body;
+    const { items, amount, address, email, date, restaurantSlug } = req.body;
 
     if (!email || !items || !address || !amount) {
       return res.status(400).json({ success: false, message: "Missing required fields" });
+    }
+
+    let restaurantId = null;
+    if (restaurantSlug) {
+      const restaurant = await birdiebiteRestaurantModel.findOne({ slug: restaurantSlug });
+      if (restaurant) restaurantId = restaurant._id;
     }
 
     let totalAmount = 0;
@@ -173,6 +198,7 @@ export const createGuestStripeCheckout = async (req, res) => {
 
     // Save the order
     const newOrder = new orderModel({
+      restaurantId,
       items: processedItems,
       amount: totalAmount,
       address,
@@ -230,7 +256,7 @@ export const createGuestStripeCheckout = async (req, res) => {
       });
     });
 
-    const frontend_url = "https://restaurant-pickup-psi.vercel.app/"; // update to production if needed
+    const frontend_url = getStripeRedirectUrl(req.body.returnUrl);
 
     const session = await stripe.checkout.sessions.create({
       line_items,
@@ -272,7 +298,8 @@ const verifyOrder = async (req, res) => {
   
 
         if (guest && updatedOrder?.email && updatedOrder?.trackingToken) {
-          const trackingLink = `https://restaurant-pickup-psi.vercel.app/track-order/${updatedOrder.trackingToken}`;
+          const frontendUrl = process.env.FRONTEND_URL || "https://restaurant-pickup-psi.vercel.app";
+        const trackingLink = `${frontendUrl.replace(/\/$/, "")}/track-order/${updatedOrder.trackingToken}`;
           await sendTrackingEmail(updatedOrder.email, trackingLink);
 
           return res.json({
@@ -301,7 +328,8 @@ export const trackGuestOrder = async (req, res) => {
   
       const order = await orderModel
         .findOne({ trackingToken: token, payment: true })
-        .populate("items.extras"); // 🟢 Populate extra ingredient details
+        .populate("items.extras")
+        .populate("restaurantId", "name slug deliveryTime image");
   
       if (!order) {
         return res.status(404).json({ success: false, message: "Order not found." });
@@ -319,11 +347,20 @@ export const trackGuestOrder = async (req, res) => {
 
   
 
-// 🟢 Fetch all orders for the admin panel
+// 🟢 Fetch all orders for the admin panel (filtered by restaurant slug or admin's restaurantId)
 const listOrders = async (req, res) => {
     try {
+        const filter = { payment: true };
+        const slug = req.query.slug;
+        if (slug) {
+            const restaurant = await birdiebiteRestaurantModel.findOne({ slug: slug.trim().toLowerCase() });
+            if (restaurant) filter.restaurantId = restaurant._id;
+            else return res.json({ success: true, data: [] }); // slug provided but restaurant not found
+        } else if (req.adminRestaurantId) {
+            filter.restaurantId = req.adminRestaurantId;
+        }
         const orders = await orderModel
-            .find({ payment: true })
+            .find(filter)
             .populate("items.extras"); // ✅ Populate extras with details
 
         res.json({ success: true, data: orders });

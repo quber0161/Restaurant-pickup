@@ -1,106 +1,198 @@
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState, useCallback } from "react";
+import { useParams, Link } from "react-router-dom";
 import axios from "axios";
+import { useContext } from "react";
+import { StoreContext } from "../../context/StoreContext";
 import "./GuestTrack.css";
 
 const GuestTrack = () => {
   const { token } = useParams();
+  const { setRestaurantSlug } = useContext(StoreContext);
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const getStatusBackgroundColor = (status) => {
-    switch (status) {
-      case "Order Processing":
-        return "#f8d7da";
-      case "Ready to Takeaway":
-        return "#fff3cd";
-      case "Taken":
-        return "#d4edda";
-      default:
-        return "#f8f9fa";
+  const apiUrl = window.location.hostname === "localhost"
+    ? "http://localhost:4000"
+    : "https://restaurant-pickup-1.onrender.com";
+
+  const fetchOrder = useCallback(async () => {
+    if (!token) {
+      setError("Invalid tracking link");
+      setLoading(false);
+      return;
     }
-  };
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await axios.get(`${apiUrl}/api/order/track/${token}`);
+      if (res.data.success) {
+        const ord = res.data.order;
+        setOrder(ord);
+        if (ord?.restaurantId?.slug) setRestaurantSlug(ord.restaurantId.slug);
+      } else {
+        setError(res.data.message || "Order not found.");
+      }
+    } catch (err) {
+      setError("Could not load order. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, [token, apiUrl]);
 
   useEffect(() => {
-    const fetchOrder = async () => {
-      try {
-        const res = await axios.get(`https://restaurant-pickup-1.onrender.com/api/order/track/${token}`);
-        if (res.data.success) {
-          setOrder(res.data.order);
-        } else {
-          alert(res.data.message || "Order not found.");
-        }
-      } catch (err) {
-        console.error("Error fetching order:", err);
-        alert("An error occurred while fetching the order.");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchOrder();
-  }, [token]);
+  }, [fetchOrder]);
 
-  if (loading) return <div className="guest-track"><h3>Loading...</h3></div>;
-  if (!order) return <div className="guest-track"><h3>No order found.</h3></div>;
+  const STATUS_FLOW = [
+    { key: "Order Processing", label: "Preparing your order", icon: "📦" },
+    { key: "Ready to Takeaway", label: "Ready for pickup", icon: "✅" },
+    { key: "Taken", label: "Collected", icon: "🎉" },
+  ];
+
+  const getStatusIndex = () => {
+    const idx = STATUS_FLOW.findIndex((s) => s.key === (order?.status || "Order Processing"));
+    return idx >= 0 ? idx : 0;
+  };
+
+  const getEstimatedTime = () => {
+    const status = order?.status || "Order Processing";
+    const deliveryTime = order?.restaurantId?.deliveryTime;
+    if (status === "Ready to Takeaway") return "Ready now!";
+    if (status === "Taken") return "Order collected";
+    return deliveryTime || "~15–25 min";
+  };
+
+  const formatAddress = () => {
+    const a = order?.address;
+    if (!a) return "";
+    const parts = [a.houseNo, a.street, a.zipCode].filter(Boolean);
+    return parts.join(", ");
+  };
+
+  const getMapsUrl = () => {
+    const addr = formatAddress();
+    if (!addr) return null;
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}`;
+  };
+
+  if (loading && !order) return (
+    <div className="guest-track">
+      <Link to="/" className="guest-track-back">← Return to BirdieBite</Link>
+      <div className="track-loading">
+        <div className="track-spinner"></div>
+        <p>Loading your order...</p>
+      </div>
+    </div>
+  );
+
+  if (error) return (
+    <div className="guest-track">
+      <Link to="/" className="guest-track-back">← Return to BirdieBite</Link>
+      <div className="track-error">
+        <span className="track-error-icon">❌</span>
+        <h3>{error}</h3>
+        <Link to="/" className="track-error-link">Back to BirdieBite</Link>
+      </div>
+    </div>
+  );
+
+  if (!order) return (
+    <div className="guest-track">
+      <Link to="/" className="guest-track-back">← Return to BirdieBite</Link>
+      <div className="track-error">
+        <h3>No order found.</h3>
+        <Link to="/" className="track-error-link">Back to BirdieBite</Link>
+      </div>
+    </div>
+  );
+
+  const statusIndex = getStatusIndex();
+  const mapsUrl = getMapsUrl();
 
   return (
     <div className="guest-track">
-      <h2>Guest Order Tracking</h2>
-      <div
-        className="guest-order"
-        style={{ backgroundColor: getStatusBackgroundColor(order.status) }}
-      >
-        <div className="order-details">
-          {order.items.map((item, idx) => (
-            <div key={idx} className="order-item">
-              <p>
-                <b>{item.name}</b> x {item.quantity}
-              </p>
+      <Link to="/" className="guest-track-back">← Return to BirdieBite</Link>
 
-              {item.mandatoryOptions && Object.keys(item.mandatoryOptions).length > 0 && (
-                <p className="order-mandatory">
-                  <b>Options:</b>{" "}
-                  {Object.entries(item.mandatoryOptions).map(([key, value], i, arr) => (
-                    <span className="mandatory" key={i}>
-                      {key}: {value.label}
-                      {value.additionalPrice ? ` (+Kr ${value.additionalPrice})` : ""}
-                      {i < arr.length - 1 ? ", " : ""}
-                    </span>
-                  ))}
-                </p>
-              )}
+      <header className="track-header">
+        <h1>Track your order</h1>
+        <p className="track-restaurant">{order.restaurantId?.name || "Restaurant"}</p>
+      </header>
 
-              {item.extras?.length > 0 && (
-                <p className="order-extras">
-                  <b>Extras:</b>{" "}
-                  {item.extras.map((extra, i) => (
-                    <span className="ex" key={i}>
-                      {extra.name} x {extra.quantity || 1}
-                      {i < item.extras.length - 1 ? ", " : ""}
-                    </span>
-                  ))}
-                </p>
-              )}
-
-              {item.comment && (
-                <p className="order-comment">
-                  <b>Note:</b> {item.comment}
-                </p>
-              )}
-            </div>
-          ))}
+      {/* Estimated time */}
+      <div className="track-eta">
+        <span className="track-eta-icon">⏱</span>
+        <div>
+          <span className="track-eta-label">Estimated time</span>
+          <span className="track-eta-value">{getEstimatedTime()}</span>
         </div>
-
-        <p><b>Total:</b> Kr {order.amount}.00</p>
-        <p><b>Items:</b> {order.items.length}</p>
-        <p>
-          <span>&#x25cf;</span>{" "}
-          <span className="status-pill">{order.status}</span>
-        </p>
-
-        <button className="gu-bt" onClick={() => window.location.reload()}>Track Order</button>
       </div>
+
+      {/* Map card */}
+      {formatAddress() && (
+        <div className="track-map-card">
+          <div className="track-map-visual">
+            <div className="track-map-pin">📍</div>
+            <div className="track-map-pattern"></div>
+          </div>
+          <div className="track-map-info">
+            <p className="track-map-label">Pickup address</p>
+            <p className="track-map-address">{formatAddress()}</p>
+            {mapsUrl && (
+              <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="track-map-directions">
+                Get directions
+              </a>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Status stepper */}
+      <div className="track-stepper">
+        {STATUS_FLOW.map((step, i) => (
+          <div key={step.key} className={`track-step ${i <= statusIndex ? "active" : ""} ${i < statusIndex ? "done" : ""}`}>
+            <div className="track-step-dot">
+              {i < statusIndex ? "✓" : step.icon}
+            </div>
+            <span className="track-step-label">{step.label}</span>
+            {i < STATUS_FLOW.length - 1 && <div className="track-step-line" />}
+          </div>
+        ))}
+      </div>
+
+      {/* Order summary */}
+      <div className="track-order-card">
+        <h3>Order summary</h3>
+        <ul className="track-items">
+          {(order.items || []).map((item, idx) => (
+            <li key={idx} className="track-item">
+              <span className="track-item-name">
+                {item.name} × {item.quantity}
+              </span>
+              {(item.mandatoryOptions && Object.keys(item.mandatoryOptions).length > 0) && (
+                <span className="track-item-options">
+                  {Object.entries(item.mandatoryOptions).map(([k, v]) => v.label).join(", ")}
+                </span>
+              )}
+              {(item.extras?.length > 0) && (
+                <span className="track-item-extras">
+                  + {item.extras.map((e) => `${e.name} × ${e.quantity || 1}`).join(", ")}
+                </span>
+              )}
+              {item.comment && <span className="track-item-note">Note: {item.comment}</span>}
+            </li>
+          ))}
+        </ul>
+        <div className="track-total">
+          <span>Total</span>
+          <span>Kr {(order.amount || 0).toFixed(2)}</span>
+        </div>
+      </div>
+
+      <button className="track-refresh" onClick={fetchOrder} disabled={loading}>
+        {loading ? "Refreshing…" : "Refresh status"}
+      </button>
     </div>
   );
 };

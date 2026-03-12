@@ -1,72 +1,99 @@
 .store-hours-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  
-  .store-hours-title {
-    font-size: 20px;
-    font-weight: bold;
-    margin: 30px 0 15px;
-    border-bottom: 2px solid #ccc;
-    padding-bottom: 5px;
-  }
-  
-  .day-row {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  
-  .day-label {
-    width: 160px;
-    font-weight: 500;
-  }
-  
-  .time-input {
-    width: 120px;
-    padding: 5px;
-    font-size: 14px;
-  }
-  
-  .closed-checkbox {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 15px;
-  }
-  
-  .override-add-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-  }
-  
-  .date-input {
-    padding: 6px;
-    font-size: 14px;
-  }
-  
-  .add-override-btn {
-    padding: 6px 12px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    font-size: 14px;
-    cursor: pointer;
-    border-radius: 4px;
-  }
-  
-  .delete-btn {
-    padding: 4px 10px;
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    font-size: 13px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
+  max-width: 600px;
+  background: var(--admin-card);
+  padding: 28px;
+  border-radius: var(--admin-radius);
+  box-shadow: var(--admin-shadow);
+}
+
+.store-hours-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--admin-text);
+  margin: 28px 0 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.store-hours-title:first-child {
+  margin-top: 0;
+}
+
+.day-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 0;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.day-label {
+  width: 140px;
+  font-weight: 500;
+  font-size: 0.9375rem;
+  color: var(--admin-text);
+}
+
+.time-input {
+  width: 110px;
+  padding: 10px 14px;
+  font-size: 0.9375rem;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-sm);
+}
+
+.closed-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: var(--admin-text-muted);
+  cursor: pointer;
+}
+
+.override-add-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.date-input {
+  padding: 10px 14px;
+  font-size: 0.9375rem;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-sm);
+}
+
+.add-override-btn {
+  padding: 10px 18px;
+  background: var(--admin-accent);
+  color: white;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--admin-radius-sm);
+  transition: background 0.2s;
+}
+
+.add-override-btn:hover {
+  background: var(--admin-accent-hover);
+}
+
+.delete-btn {
+  padding: 8px 14px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border-radius: var(--admin-radius-sm);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.delete-btn:hover {
+  background: #dc2626;
+}

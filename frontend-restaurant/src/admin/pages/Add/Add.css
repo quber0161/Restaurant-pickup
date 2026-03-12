@@ -1,112 +1,142 @@
-.add{
-    width: 70%;
-    margin-left: max(5vw,25px);
-    margin-top: 50px;
-    color: #6d6d6d;
-    font-size: 16px;
+.add {
+  max-width: 720px;
+  background: var(--admin-card);
+  padding: 32px;
+  border-radius: var(--admin-radius);
+  box-shadow: var(--admin-shadow);
 }
 
-.add form{
-    gap: 20px;
+.add form {
+  gap: 24px;
 }
 
-.add-img-upload img{
-    width: 120px;
-    cursor: pointer;
+.add h2,
+.add p {
+  color: var(--admin-text);
+  font-weight: 500;
 }
 
-.add-product-name, .add-product-description{
-    width: max(40%,280px);
+.add-img-upload img {
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  cursor: pointer;
+  border-radius: var(--admin-radius-sm);
+  border: 2px dashed var(--admin-border);
 }
 
-.add-product-name input, .add-product-description textarea{
-    padding: 10px;
+.add-img-upload img:hover {
+  border-color: var(--admin-accent);
 }
 
-.add-category-price{
-    display: flex;
-    gap: 30px;
+.add-product-name,
+.add-product-description {
+  width: 100%;
+  max-width: 100%;
 }
 
-.add-category-price select, .add-category-price input{
-    max-width: 120px;
-    padding: 10px;
+.add-product-name input,
+.add-product-description textarea {
+  padding: 12px 16px;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-sm);
+  font-size: 0.9375rem;
 }
 
-.add-button{
-    max-width: 120px;
-    border: none;
-    padding: 10px;
-    background-color: rgb(226, 62, 62);
-    color: white;
-    cursor: pointer;
+.add-product-name input:focus,
+.add-product-description textarea:focus {
+  outline: none;
+  border-color: var(--admin-accent);
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
 }
 
-/* 🟢 Extra Ingredients Section */
+.add-category-price {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.add-category-price select,
+.add-category-price input {
+  padding: 12px 16px;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-sm);
+  font-size: 0.9375rem;
+}
+
+.add-button {
+  padding: 12px 28px;
+  background: var(--admin-accent);
+  color: white;
+  border: none;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border-radius: var(--admin-radius-sm);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.add-button:hover:not(:disabled) {
+  background: var(--admin-accent-hover);
+}
+
+.add-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 .add-extras {
-    margin-top: 15px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+  padding: 20px;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-sm);
+  background: var(--admin-bg);
 }
 
 .extras-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
 }
 
-.extra-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 5px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.extra-item input {
-    transform: scale(1.2);
+.extra-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: var(--admin-card);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-sm);
+  cursor: pointer;
 }
 
 .add-mandatory-options {
-    margin-top: 20px;
-    padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-  }
-  
-  .mandatory-form input {
-    padding: 8px;
-    margin-bottom: 10px;
-    width: 60%;
-  }
-  
-  .choices-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  
-  .current-choices {
-    margin: 10px 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  
-  .choice-item {
-    background-color: #eee;
-    padding: 5px 10px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-  
-  .saved-options {
-    margin-top: 10px;
-  }
-  
+  padding: 20px;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-sm);
+  background: var(--admin-bg);
+}
+
+.mandatory-form input {
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-sm);
+}
+
+.choices-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.choice-item {
+  background: var(--admin-card);
+  padding: 8px 14px;
+  border-radius: var(--admin-radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+}

@@ -1,20 +1,22 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import "./Extras.css";
 import axios from "axios";
 import { toast } from "react-toastify";
 
 
 const Extras = () => {
-    
-    const url = "https://restaurant-pickup-1.onrender.com";
+  const { url, token, restaurantSlug } = useOutletContext();
   const [extras, setExtras] = useState([]);
   const [newExtra, setNewExtra] = useState({ name: "", price: "" });
 
-  // 🟢 Fetch all extras
+  // Fetch extras for this restaurant only
   const fetchExtras = async () => {
     try {
-      const response = await axios.get(`${url}/api/extras/list`);
+      const slugParam = restaurantSlug ? `?slug=${restaurantSlug}` : "";
+      const headers = token ? { headers: { token } } : {};
+      const response = await axios.get(`${url}/api/extras/list${slugParam}`, headers);
       if (response.data.success) {
         setExtras(response.data.extras);
       } else {
@@ -27,7 +29,7 @@ const Extras = () => {
 
   useEffect(() => {
     fetchExtras();
-  }, []);
+  }, [restaurantSlug]);
 
   // 🟢 Handle input changes
   const onChangeHandler = (event) => {
@@ -35,7 +37,7 @@ const Extras = () => {
     setNewExtra((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 🟢 Add a new extra ingredient
+  // Add extra - optimistic update
   const onSubmitHandler = async (event) => {
     event.preventDefault();
     if (!newExtra.name.trim() || !newExtra.price) {
@@ -43,33 +45,45 @@ const Extras = () => {
       return;
     }
 
+    const tempId = "temp-" + Date.now();
+    const item = { ...newExtra, _id: tempId };
+    setExtras((prev) => [...prev, item]);
+    setNewExtra({ name: "", price: "" });
+
     try {
-      const response = await axios.post(`${url}/api/extras/add`, newExtra);
+      const payload = { ...newExtra, restaurantSlug };
+      const headers = token ? { headers: { token } } : {};
+      const response = await axios.post(`${url}/api/extras/add`, payload, headers);
       if (response.data.success) {
-        setExtras((prev) => [...prev, { ...newExtra, _id: response.data.id }]);
-        setNewExtra({ name: "", price: "" });
-        toast.success("Extra added successfully!");
+        const serverId = response.data.id || response.data._id;
+        setExtras((prev) => prev.map((e) => (e._id === tempId ? { ...e, _id: serverId } : e)));
+        toast.success("Extra added!");
       } else {
+        setExtras((prev) => prev.filter((e) => e._id !== tempId));
         toast.error(response.data.message);
       }
     } catch (error) {
-      console.error("Error adding extra:", error);
+      setExtras((prev) => prev.filter((e) => e._id !== tempId));
       toast.error("Error adding extra ingredient");
     }
   };
 
-  // 🟢 Remove an extra ingredient
+  // Remove extra - optimistic update
   const removeExtra = async (extraId) => {
+    const removed = extras.find((e) => e._id === extraId);
+    setExtras((prev) => prev.filter((e) => e._id !== extraId));
+    if (String(extraId).startsWith("temp-")) return;
+
     try {
-      const response = await axios.post(`${url}/api/extras/remove`, { id: extraId });
-      if (response.data.success) {
-        setExtras((prev) => prev.filter((extra) => extra._id !== extraId));
-        toast.success("Extra removed successfully!");
-      } else {
+      const headers = token ? { headers: { token } } : {};
+      const response = await axios.post(`${url}/api/extras/remove`, { id: extraId }, headers);
+      if (response.data.success) toast.success("Extra removed!");
+      else {
+        if (removed) setExtras((prev) => [...prev, removed]);
         toast.error("Error removing extra!");
       }
     } catch (error) {
-      console.error("Error removing extra:", error);
+      if (removed) setExtras((prev) => [...prev, removed]);
       toast.error("Error removing extra ingredient!");
     }
   };

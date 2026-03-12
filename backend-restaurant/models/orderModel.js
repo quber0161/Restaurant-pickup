@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema({
+    restaurantId: { type: mongoose.Schema.Types.ObjectId, ref: "birdiebiteRestaurant", default: null },
     userId: { type: String, required: false },
     items: [
         {

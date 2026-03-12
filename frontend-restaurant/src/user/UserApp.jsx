@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from "react";
-import { Routes, Route } from "react-router-dom";  // ❌ No BrowserRouter here
-import Home from "./pages/Home/Home";
+import { Routes, Route, useLocation } from "react-router-dom";  // ❌ No BrowserRouter here
 import Cart from "./pages/Cart/Cart";
 import Order from "./pages/Order/Order";
 import Navbar from "./components/Navbar/Navbar";
@@ -13,33 +12,52 @@ import MenuPage from "./pages/MenuPAge/MenuPage";
 import AboutUs from "./pages/AboutUs/AboutUs";
 import PrivacyPolicy from "./pages/PrivacyPolicy/PrivacyPolicy";
 import GuestTrack from "./pages/GuestTrack/GuestTrack";
+import BirdieBiteLanding from "./pages/BirdieBiteLanding/BirdieBiteLanding";
 import HomeLanding from "./pages/HomeLanding/HomeLanding";
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
 
 function UserApp() {
   const [showLogin, setShowLogin] = useState(false);
+  const location = useLocation();
+  const isBirdieBiteHome = location.pathname === "/";
 
   return (
     <>
+      <ScrollToTop />
       {showLogin && <Login setShowLogin={setShowLogin} />}
-      <div className="page-container">
-        <Navbar setShowLogin={setShowLogin} />
-        <div className="content-wrap">
+      {isBirdieBiteHome ? (
         <Routes>
-          {/* <Route path="/" element={<Home />} /> */}
-          <Route path="/" element={<HomeLanding />} />
-          <Route path="/menu" element={<MenuPage />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/order" element={<Order />} />
-          <Route path="/verify" element={<Verify />} />
-          <Route path="/myorders" element={<MyOrders />} />
-          <Route path="/about" element={<AboutUs />} />
-          <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route path="/track-order/:token" element={<GuestTrack/>} />
-          
+          <Route path="/" element={<BirdieBiteLanding setShowLogin={setShowLogin} />} />
         </Routes>
-        </div>
-      </div>
-      <Footer />
+      ) : (
+        <>
+          <div className="page-container">
+            <Navbar setShowLogin={setShowLogin} />
+            <div className="content-wrap">
+              <Routes>
+                <Route path="/home" element={<HomeLanding />} />
+                <Route path="/menu" element={<MenuPage />} />
+                <Route path="/menu/:slug" element={<MenuPage />} />
+                <Route path="/cart" element={<Cart />} />
+                <Route path="/order" element={<Order />} />
+                <Route path="/verify" element={<Verify />} />
+                <Route path="/myorders" element={<MyOrders />} />
+                <Route path="/about" element={<AboutUs />} />
+                <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/track-order/:token" element={<GuestTrack/>} />
+              </Routes>
+            </div>
+          </div>
+          <Footer />
+        </>
+      )}
     </>
   );
 }

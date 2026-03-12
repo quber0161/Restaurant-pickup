@@ -30,30 +30,37 @@ const Login = ({ setShowLogin }) => {
 const onSubmitHandler = async (event) => {
   event.preventDefault();
 
-  let endpoint = currState === "Login" ? "/api/user/login" : "/api/user/register";
-  const response = await axios.post(url + endpoint, data);
+  try {
+    let endpoint = currState === "Login" ? "/api/user/login" : "/api/user/register";
+    const response = await axios.post(url + endpoint, data);
 
   if (response.data.success) {
-    const { token, role, userId } = response.data;
+    const { token, role, userId, restaurantSlug } = response.data;
     setToken(token);
     setUserRole(role);
 
-    // Store token and role
     localStorage.setItem("token", token);
     localStorage.setItem("role", role);
-    localStorage.setItem("userId", userId); // Or whatever key your backend returns
-
+    localStorage.setItem("userId", userId);
 
     setShowLogin(false);
 
-    // 🔹 Redirect based on role
-    if (role === "admin") {
-      navigate("/admin/orders");
+    // Redirect based on role
+    if (role === "superadmin") {
+      navigate("/superadmin");
+    } else if (role === "admin" && restaurantSlug) {
+      navigate(`/admin/${restaurantSlug}/orders`);
+    } else if (role === "admin") {
+      navigate("/");
     } else {
       navigate("/");
     }
   } else {
-    alert(response.data.message);
+    alert(response.data.message || "Login failed");
+  }
+  } catch (err) {
+    const msg = err.response?.data?.message || err.message || "Network error – is the backend running?";
+    alert(msg);
   }
 };
 

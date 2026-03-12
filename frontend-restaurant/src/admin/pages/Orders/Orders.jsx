@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import "./Orders.css";
 import axios from "axios";
 import { assets } from "../../assets/assets";
@@ -11,15 +12,18 @@ import notifySound from "../../assets/notify.wav";
 import { findPrinters, printOrder } from "../../utils/qzPrinter";
 
 // eslint-disable-next-line react/prop-types
-const Orders = ({ url }) => {
+const Orders = () => {
+  const { url, token, restaurantSlug } = useOutletContext();
   const [orders, setOrders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 10;
 
-  // Fetch orders from backend
+  // Fetch orders from backend (admin token filters to their restaurant)
   const fetchAllOrders = async () => {
     try {
-      const response = await axios.get(url + "/api/order/list");
+      const slugParam = restaurantSlug ? `?slug=${restaurantSlug}` : "";
+      const headers = token ? { headers: { token } } : {};
+      const response = await axios.get(url + "/api/order/list" + slugParam, headers);
       if (response.data.success) {
         const paidOrders = response.data.data.filter(
           (order) => order.payment === true
@@ -40,7 +44,7 @@ const Orders = ({ url }) => {
     const interval = setInterval(fetchAllOrders, 5000);
 
     // Real-time listener via socket
-    const socket = io(url); // adjust to match your backend address
+    const socket = io(url);
 
     socket.on("newOrder", async (newOrder) => {
       // 🎵 Play notification sound
@@ -65,7 +69,7 @@ const Orders = ({ url }) => {
       clearInterval(interval);
       socket.disconnect();
     };
-  }, []);
+  }, [url, token, restaurantSlug]);
 
   //
 
@@ -74,7 +78,7 @@ const Orders = ({ url }) => {
     const response = await axios.post(url + "/api/order/status", {
       orderId,
       status: event.target.value,
-    });
+    }, token ? { headers: { token } } : {});
     if (response.data.success) {
       await fetchAllOrders();
     }
@@ -154,7 +158,7 @@ const Orders = ({ url }) => {
           ) : (
             <div
               key={index}
-              className="order-item"
+              className={`order-item ${order.status === "Order Processing" ? "processing" : order.status === "Ready to Takeaway" ? "ready" : "taken"}`}
               style={{
                 backgroundColor: getStatusBackgroundColor(order.status),
               }}
@@ -243,6 +247,7 @@ const Orders = ({ url }) => {
       </div>
 
       {/* Pagination */}
+      <div className="pagination-container">
       <div className="pagination">
         <button
           disabled={currentPage === 1}
@@ -257,6 +262,7 @@ const Orders = ({ url }) => {
         >
           Next
         </button>
+      </div>
       </div>
       <ToastContainer position="top-right" autoClose={5000} />
     </div>

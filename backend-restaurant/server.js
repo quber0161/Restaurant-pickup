@@ -14,19 +14,22 @@ import extraRouter from "./routes/extraRoute.js"
 import { Server } from "socket.io"
 import http from "http"
 import storeHourRouter from "./routes/storeHourRoute.js"
+import birdiebiteRestaurantRouter from "./routes/birdiebiteRestaurantRoute.js"
+import adminRouter from "./routes/adminRoute.js"
 
 
 // app config
 const app = express()
-const port = 4000
+const port = process.env.PORT || 4000
 
 // ✅ Create HTTP server for Socket.IO
 const server = http.createServer(app)
 
 // ✅ Setup Socket.IO server
+const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173"
 const io = new Server(server, {
     cors: {
-        origin: "https://restaurant-pickup-psi.vercel.app/", // or your frontend URL
+        origin: frontendUrl,
         methods: ["GET", "POST"]
     }
 })
@@ -57,6 +60,8 @@ app.use("/api/category", categoryRouter)
 app.use("/categoryimages", express.static('uploads/categories'))
 app.use("/api/extras", extraRouter); // 🟢 Register Extra Ingredients API
 app.use("/api/store-hours", storeHourRouter)
+app.use("/api/birdiebite/restaurants", birdiebiteRestaurantRouter)
+app.use("/api/admin", adminRouter)
 
 app.get("/", (req, res) => {
     res.send("API Working")
@@ -64,7 +69,5 @@ app.get("/", (req, res) => {
 
 // ✅ Use the HTTP server to listen instead of app.listen
 server.listen(port, () => {
-    console.log(`🚀 Server running at https://restaurant-pickup-psi.vercel.app/:${port}`)
+    console.log(`🚀 Server running on port ${port}`)
 })
-
-// mongodb+srv://dilushan06:<db_password>@cluster0.xbo2f.mongodb.net/?

@@ -1,16 +1,16 @@
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
+import { useOutletContext } from 'react-router-dom'
 import './List.css'
 import axios from 'axios'
 import { toast } from 'react-toastify'
-
 const List = () => {
-
-  const url = "https://restaurant-pickup-1.onrender.com"
+  const { url, token, restaurantSlug } = useOutletContext();
   const [list, setList] = useState([]);
 
   const fetchList = async () => {
-    const response = await axios.get(`${url}/api/food/list`);
+    const q = restaurantSlug ? `?slug=${restaurantSlug}` : "";
+    const response = await axios.get(`${url}/api/food/list${q}`, { headers: { token } });
     if (response.data.success) {
       setList(response.data.data);
     }
@@ -19,31 +19,37 @@ const List = () => {
     }
   }
 
-  const removeFood = async(foodId) => {
-    const response = await axios.post(`${url}/api/food/remove`,{id:foodId})
-    await fetchList();
-    if (response.data.success) {
-      toast.success(response.data.message)      
-    }
-    else{
+  const removeFood = async (foodId) => {
+    const removed = list.find((f) => f._id === foodId);
+    setList((prev) => prev.filter((f) => f._id !== foodId));
+    try {
+      const response = await axios.post(`${url}/api/food/remove`, { id: foodId }, { headers: { token } });
+      if (response.data.success) toast.success(response.data.message);
+      else {
+        toast.error("Error");
+        if (removed) setList((prev) => [...prev, removed].sort((a, b) => 0));
+      }
+    } catch {
       toast.error("Error");
+      if (removed) setList((prev) => [...prev, removed]);
     }
-  }
+  };
 
   const toggleSoldOut = async (foodId, currentStatus) => {
+    const newStatus = !currentStatus;
+    setList((prev) => prev.map((f) => (f._id === foodId ? { ...f, isSoldOut: newStatus } : f)));
     try {
       const response = await axios.post(`${url}/api/food/update-soldout`, {
         foodId,
-        isSoldOut: !currentStatus
-      });
-  
-      if (response.data.success) {
-        toast.success("Sold out status updated");
-        fetchList(); // Refresh list
-      } else {
+        isSoldOut: newStatus
+      }, { headers: { token } });
+      if (response.data.success) toast.success("Sold out status updated");
+      else {
+        setList((prev) => prev.map((f) => (f._id === foodId ? { ...f, isSoldOut: currentStatus } : f)));
         toast.error("Failed to update status");
       }
-    } catch (error) {
+    } catch {
+      setList((prev) => prev.map((f) => (f._id === foodId ? { ...f, isSoldOut: currentStatus } : f)));
       toast.error("Error updating sold out status");
     }
   };
@@ -51,7 +57,7 @@ const List = () => {
 
   useEffect(() => {
     fetchList();
-  }, [])
+  }, [restaurantSlug])
 
   return (
     <div className='list add flex-col'>
@@ -68,7 +74,7 @@ const List = () => {
         {list.map((item,index)=>{
           return(
             <div key={index} className='list-table-format'>
-              <img src={`${url}/foodimages/`+item.image} alt="" />
+              <img src={item.image?.startsWith?.("http") ? item.image : `${url}/foodimages/` + item.image} alt="" />
               <p>{item.name}</p>
               <p>{item.category}</p>
               <p>{item.price}</p>

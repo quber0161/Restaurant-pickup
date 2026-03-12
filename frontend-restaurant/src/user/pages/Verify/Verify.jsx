@@ -46,7 +46,7 @@ const Verify = () => {
 
   useEffect(() => {
     verifyPayment();
-  }, []);
+  }, [url]);
 
   return <div className="verify"><div className="spinner"></div></div>;
 };

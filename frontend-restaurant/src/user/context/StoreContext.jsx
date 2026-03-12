@@ -10,7 +10,9 @@ export const StoreContext = createContext(null);
 const StoreContextProvider = (props) => {
   
   
-  const url = "https://restaurant-pickup-1.onrender.com";
+  const url = window.location.hostname === "localhost"
+    ? "http://localhost:4000"
+    : "https://restaurant-pickup-1.onrender.com";
   const [token, setToken] = useState(localStorage.getItem("token") || "");
   const [cartItems, setCartItems] = useState(() => {
     const savedGuestCart = localStorage.getItem("guestCart");
@@ -20,7 +22,8 @@ const StoreContextProvider = (props) => {
       ? JSON.parse(savedGuestCart)
       : {};
   });
-  const [userRole, setUserRole] = useState(localStorage.getItem("role") || ""); // 🔹 Store user role
+  const [userRole, setUserRole] = useState(localStorage.getItem("role") || "");
+  const [restaurantSlug, setRestaurantSlug] = useState(null);
   const [food_list, setFoodList] = useState([]);
   const [category_list, setCategoryList] = useState([]);
 
@@ -85,25 +88,8 @@ const StoreContextProvider = (props) => {
         console.error("Error adding to cart:", error);
       }
     } else {
-      // 🧠 For guests: update localStorage
-      setCartItems(prev => {
-        const currentQty = prev[cartKey]?.quantity || 0;
-        const updatedCartItem = {
-          itemId,
-          extras: enrichedExtras,
-          comment,
-          quantity: currentQty + quantity,
-          mandatoryOptions
-        };
-  
-        const newCart = {
-          ...prev,
-          [cartKey]: updatedCartItem
-        };
-  
-        localStorage.setItem("guestCart", JSON.stringify(newCart));
-        return newCart;
-      });
+      // 🧠 For guests: persist to localStorage (state already updated above)
+      localStorage.setItem("guestCart", JSON.stringify(updatedCart));
     }
   };
   
@@ -202,8 +188,9 @@ const StoreContextProvider = (props) => {
       if (response.data.success && response.data.cartData) {
         let transformedCart = {};
   
-        // 🟢 Fetch extras list to get names & prices
-        const extrasResponse = await axios.get(url + "/api/extras/list");
+        // Fetch extras for current restaurant (or legacy if no slug)
+        const slugParam = restaurantSlug ? `?slug=${restaurantSlug}` : "";
+        const extrasResponse = await axios.get(url + "/api/extras/list" + slugParam);
         const extrasMap = {};
         extrasResponse.data.extras.forEach((extra) => {
           extrasMap[extra._id] = extra; // Store extras by ID
@@ -237,14 +224,28 @@ const StoreContextProvider = (props) => {
   
   
 
-  const fetchCategories = async () => {
-    const response = await axios.get(url + "/api/category/list");
-    setCategoryList(response.data.categories);
+  const fetchCategories = async (slug = null) => {
+    try {
+      const slugParam = slug ?? restaurantSlug;
+      const q = slugParam ? `?slug=${slugParam}` : "";
+      const response = await axios.get(url + "/api/category/list" + q);
+      setCategoryList(response.data?.categories || []);
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+      setCategoryList([]);
+    }
   };
 
-  const fetchFoodList = async () => {
-    const response = await axios.get(url + "/api/food/list");
-    setFoodList(response.data.data);
+  const fetchFoodList = async (slug = null) => {
+    try {
+      const slugParam = slug ?? restaurantSlug;
+      const q = slugParam ? `?slug=${slugParam}` : "";
+      const response = await axios.get(url + "/api/food/list" + q);
+      setFoodList(response.data?.data || []);
+    } catch (err) {
+      console.error("Error fetching food:", err);
+      setFoodList([]);
+    }
   };
 
   const logout = () => {
@@ -269,12 +270,14 @@ const StoreContextProvider = (props) => {
       }
     }
     loadData();
-  }, [token]);
+  }, [token, restaurantSlug]);
   
   
 
   const contextValue = {
     food_list,
+    restaurantSlug,
+    setRestaurantSlug,
     cartItems,
     setCartItems,
     addToCart,

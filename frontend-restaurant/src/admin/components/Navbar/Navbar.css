@@ -1,29 +1,62 @@
-.navbar-admin{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 4%;
+.navbar-admin {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  height: 72px;
+  background: var(--admin-card, #fff);
+  box-shadow: var(--admin-shadow, 0 1px 3px rgba(0,0,0,0.06));
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
-.navbar .logo{
-    width: max(10%,80px);
+.navbar-admin .logo {
+  width: max(90px, 8%);
+  height: auto;
+  object-fit: contain;
 }
 
-.navbar .profile{
-    width: 40px;
+.navbar-admin h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--admin-text, #1e293b);
+  letter-spacing: -0.02em;
+}
+
+.admin-restaurant-label {
+  font-size: 0.875rem;
+  color: var(--admin-text-muted, #64748b);
+  font-weight: 500;
+  padding: 6px 12px;
+  background: var(--admin-bg, #f8fafc);
+  border-radius: var(--admin-radius-sm, 8px);
+}
+
+.admin-back-menu {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--admin-accent, #059669);
+  padding: 8px 14px;
+  border-radius: var(--admin-radius-sm, 8px);
+  transition: background 0.2s, color 0.2s;
+}
+
+.admin-back-menu:hover {
+  background: rgba(5, 150, 105, 0.08);
 }
 
 .logout-btn {
-    background-color: #ff4d4d;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 5px;
-  }
-  
-  .logout-btn:hover {
-    background-color: #e60000;
-  }
-  
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 9px 18px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--admin-radius-sm, 8px);
+  transition: background 0.2s;
+}
+
+.logout-btn:hover {
+  background: #b91c1c;
+}

@@ -1,0 +1,159 @@
+.restaurants-admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.restaurants-admin-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #2d333f;
+}
+
+.btn-add {
+  padding: 0.6rem 1.25rem;
+  background: #1a5f37;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-add:hover {
+  background: #0d3d21;
+}
+
+.restaurant-form {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 2rem;
+}
+
+.restaurant-form h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+
+.form-row {
+  margin-bottom: 1rem;
+}
+
+.form-row label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #2d333f;
+}
+
+.form-row input {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.form-hint {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-top: 0.5rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.form-actions button {
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.form-actions button[type="button"] {
+  background: #e5e5e5;
+  border: none;
+}
+
+.form-actions button[type="submit"] {
+  background: #1a5f37;
+  color: #fff;
+  border: none;
+}
+
+.restaurants-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.restaurant-card {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.restaurant-card-image {
+  height: 140px;
+  overflow: hidden;
+}
+
+.restaurant-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.restaurant-card-info {
+  padding: 1rem;
+}
+
+.restaurant-card-info h4 {
+  margin: 0 0 0.25rem;
+  font-size: 1.1rem;
+}
+
+.restaurant-card-info p {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.restaurant-card-info .rating {
+  color: #1a5f37;
+  font-weight: 600;
+}
+
+.restaurant-card-actions {
+  padding: 0 1rem 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.restaurant-card-actions button {
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  background: #1a5f37;
+  color: #fff;
+  border: none;
+}
+
+.restaurant-card-actions button:hover {
+  background: #0d3d21;
+}
+
+.restaurant-card-actions .btn-delete {
+  background: #dc2626;
+}
+
+.restaurant-card-actions .btn-delete:hover {
+  background: #b91c1c;
+}

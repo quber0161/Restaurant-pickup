@@ -14,12 +14,14 @@ const Cart = () => {
     url,
     token,
     loadCartData,
+    restaurantSlug,
   } = useContext(StoreContext);
 
   const [storeStatus, setStoreStatus] = useState({
     isOpen: false,
     isOrderAllowed: false,
     isPreOrderTime: false,
+    loading: true,
   });
 
   useEffect(() => {
@@ -27,22 +29,29 @@ const Cart = () => {
     if (token) {
       loadCartData(token);
     }
-
-    fetch("https://restaurant-pickup-1.onrender.com/api/store-hours/store-status")
+    setStoreStatus((prev) => ({ ...prev, loading: true }));
+    const params = new URLSearchParams();
+    if (restaurantSlug) params.set("slug", restaurantSlug);
+    const now = new Date();
+    params.set("clientDate", now.toISOString().slice(0, 10));
+    params.set("clientTime", now.toTimeString().slice(0, 5));
+    fetch(`${url}/api/store-hours/store-status?${params}`)
       .then((res) => res.json())
       .then((data) => {
         setStoreStatus({
           isOpen: data.isOpen,
           isOrderAllowed: data.isOrderAllowed,
           isPreOrderTime: data.isPreOrderTime,
+          loading: false,
         });
       })
-      .catch((err) => console.error("Failed to fetch store status", err));
-  }, [token]);
+      .catch((err) => {
+        console.error("Failed to fetch store status", err);
+        setStoreStatus((prev) => ({ ...prev, loading: false, isOrderAllowed: true }));
+      });
+  }, [token, restaurantSlug, url]);
 
   const hasItems = Object.keys(cartItems).length > 0;
-
-  console.log(cartItems);
 
   return (
     <div className="cart">
@@ -74,7 +83,7 @@ const Cart = () => {
 
               if (!foodItem) return null;
 
-              const extrasCost = cartItem.extras.reduce(
+              const extrasCost = (cartItem.extras || []).reduce(
                 (acc, extra) => acc + extra.price * extra.quantity,
                 0
               );
@@ -98,7 +107,7 @@ const Cart = () => {
               return (
                 <div key={key}>
                   <div className="cart-items-title cart-items-item">
-                    <img src={url + "/foodimages/" + foodItem.image} alt="" />
+                    <img src={foodItem.image?.startsWith?.("http") ? foodItem.image : url + "/foodimages/" + foodItem.image} alt="" />
                     <div>
                       <p className="item-name">{foodItem.name}</p>
                       {cartItem.mandatoryOptions && (
@@ -122,7 +131,7 @@ const Cart = () => {
 
                       <p className="cart-extras">
                         <b>Extras:</b>
-                        {cartItem.extras.map((extra, index) => {
+                        {(cartItem.extras || []).map((extra, index) => {
                           // Find the extra details from food_list
                           const extraDetails = food_list
                             .flatMap((f) => f.extras || [])
@@ -138,7 +147,7 @@ const Cart = () => {
                             <span key={extra._id}>
                               {extraName} x {extra.quantity} (Kr{" "}
                               {extraPrice * extra.quantity})
-                              {index < cartItem.extras.length - 1 ? ", " : ""}
+                              {index < (cartItem.extras || []).length - 1 ? ", " : ""}
                             </span>
                           );
                         })}
@@ -175,7 +184,9 @@ const Cart = () => {
                 </div>
               </div>
 
-              {storeStatus.isOrderAllowed || storeStatus.isPreOrderTime ? (
+              {storeStatus.loading ? (
+                <button disabled className="checkout-btn">Loading...</button>
+              ) : storeStatus.isOrderAllowed || storeStatus.isPreOrderTime ? (
                 <Link to="/order">
                   <button className="checkout-btn">
                     {storeStatus.isPreOrderTime

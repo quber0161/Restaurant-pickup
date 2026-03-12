@@ -25,7 +25,4 @@ const sendEmail = async (to, subject, text, html = '') => {
   }
 };
 
-//sendEmail("gunalandilushan@gmail.com", "Test Email", "This is a test", "<p>Test HTML</p>");
-
-
 export default sendEmail;

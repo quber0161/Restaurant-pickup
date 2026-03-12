@@ -8,9 +8,10 @@ import { useNavigate } from 'react-router-dom'
 
 
 const Order = () => {
+  const navigate = useNavigate();
+  const {getTotalCartAmount,token,food_list,cartItems,url,restaurantSlug} = useContext(StoreContext)
 
-  const {getTotalCartAmount,token,food_list,cartItems,url} = useContext(StoreContext)
-
+  const [submitting, setSubmitting] = useState(false);
   const [data,setData] = useState({
     firstName:"",
     lastName:"",
@@ -30,6 +31,7 @@ const Order = () => {
 
   const order = async (event) => {
     event.preventDefault();
+    setSubmitting(true);
     let orderItems = [];
 
     Object.values(cartItems).forEach((cartItem) => {
@@ -46,8 +48,6 @@ const Order = () => {
           : {};
 
 
-          console.log("💡 Mandatory Options for", foodItem.name, "=>", cartItem.mandatoryOptions);
-
         orderItems.push({
           name: foodItem.name,
           price: foodItem.price,
@@ -61,7 +61,8 @@ const Order = () => {
 
       
     if (orderItems.length === 0) {
-      alert("❌ No items in order. Please add items to your cart.");
+      setSubmitting(false);
+      alert("❌ No items in order. Please add items to your cart from the menu first.");
       return;
     }
   
@@ -71,17 +72,14 @@ const Order = () => {
       items: orderItems,
       amount: getTotalCartAmount(),
       date: currentDate,
+      restaurantSlug: restaurantSlug || null,
+      returnUrl: window.location.origin,
     };
-    console.log("📦 Order Data:", orderData);//////////////////////////////
-
-  
     try {
       let response;
       if (token) {
         // Logged in user
         orderData.userId = localStorage.getItem("userId");
-        console.log("📦 Order Data:", orderData);//////////////////////////////
-
         response = await axios.post(url + "/api/order/place", orderData, {
           headers: { token },
         });
@@ -93,29 +91,25 @@ const Order = () => {
       }
   
       if (response.data.success) {
-
-        localStorage.removeItem("guestCart");/////
+        localStorage.removeItem("guestCart");
         if (response.data.session_url) {
-          // Go to Stripe payment
-          window.location.replace(response.data.session_url);
+          window.location.href = response.data.session_url;
         } else {
-          // For guests - show message page
-          //alert("✅ Order placed. Please check your email for the tracking link.");
           navigate("/");
         }
       } else {
-        alert("❌ " + response.data.message);
+        setSubmitting(false);
+        alert("❌ " + (response.data.message || "Order failed"));
       }
     } catch (error) {
+      setSubmitting(false);
       console.error("Order API Error:", error);
-      alert("Failed to place order. Please check the console for details.");
+      alert("Failed to place order: " + (error.response?.data?.message || error.message || "Please try again."));
     }
   };
   
 
 
-
-  const navigate = useNavigate();
 
   useEffect(()=>{
     const fetchLastAddress = async () => {
@@ -135,7 +129,7 @@ const Order = () => {
     };
 
     fetchLastAddress();
-  },[])
+  }, [token, url])
 
 
 
@@ -166,7 +160,9 @@ const Order = () => {
               <b>Kr {getTotalCartAmount()===0?0:getTotalCartAmount()}</b>
             </div>
           </div>
-          <button type='submit'>PROCEED TO PAYMENT</button>
+          <button type='submit' disabled={submitting}>
+            {submitting ? "Processing…" : "PROCEED TO PAYMENT"}
+          </button>
         </div>
       </div>
     </form>

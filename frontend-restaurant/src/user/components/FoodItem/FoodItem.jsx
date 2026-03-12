@@ -70,8 +70,6 @@ const FoodItem = ({ id, name, price, description, image, extras = [], soldOut = 
 
     
     addToCart(id, formattedExtras, comment, quantity, formattedMandatory);
-    
-    console.log("formattedMandatory: ",formattedMandatory)
   
     // ✅ Reset state
     setShowPopup(false);
@@ -91,7 +89,7 @@ const FoodItem = ({ id, name, price, description, image, extras = [], soldOut = 
       >
         <img
           className="food-item-image"
-          src={url + "/foodimages/" + image}
+          src={image?.startsWith?.("http") ? image : url + "/foodimages/" + image}
           alt=""
         />
         {soldOut && <div className="sold-out-overlay">Sold Out</div>}

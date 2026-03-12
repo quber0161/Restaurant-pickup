@@ -14,4 +14,4 @@ export const assets ={
     parcel_icon
 }
 
-export const url = 'http://localhost:4000'
+export const url = typeof window !== 'undefined' && window.location?.hostname === "localhost" ? "http://localhost:4000" : "https://restaurant-pickup-1.onrender.com";

@@ -1,80 +1,389 @@
+/* GuestTrack - Foodora/Wolt-style tracking UI */
+
 .guest-track {
   padding: 20px;
-  max-width: 960px;
-  margin: auto;
-  margin-top: 120px;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  max-width: 480px;
+  margin: 0 auto;
+  margin-top: 100px;
+  font-family: "Outfit", -apple-system, BlinkMacSystemFont, sans-serif;
+  padding-bottom: 60px;
 }
 
-.guest-order {
+.guest-track-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 24px;
+  padding: 8px 14px;
+  color: #1a5f37;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  background: rgba(26, 95, 55, 0.08);
+  border-radius: 10px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.guest-track-back:hover {
+  background: rgba(26, 95, 55, 0.15);
+  color: #0d3d21;
+}
+
+/* Loading */
+.track-loading {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.track-spinner {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 16px;
+  border: 3px solid #eee;
+  border-top-color: #1a5f37;
+  border-radius: 50%;
+  animation: track-spin 0.8s linear infinite;
+}
+
+@keyframes track-spin {
+  to { transform: rotate(360deg); }
+}
+
+.track-loading p {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+/* Error */
+.track-error {
+  text-align: center;
+  padding: 48px 20px;
+  background: #fff5f5;
+  border-radius: 16px;
+  border: 1px solid #fecaca;
+}
+
+.track-error-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.track-error h3 {
+  color: #991b1b;
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+}
+
+.track-error-link {
+  color: #1a5f37;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.track-error-link:hover {
+  text-decoration: underline;
+}
+
+/* Header */
+.track-header {
+  margin-bottom: 20px;
+}
+
+.track-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 4px;
+}
+
+.track-restaurant {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* ETA card */
+.track-eta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #1a5f37 0%, #2d8a4e 100%);
+  border-radius: 14px;
+  color: white;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 14px rgba(26, 95, 55, 0.25);
+}
+
+.track-eta-icon {
+  font-size: 1.75rem;
+}
+
+.track-eta-label {
+  display: block;
+  font-size: 0.8rem;
+  opacity: 0.9;
+  margin-bottom: 2px;
+}
+
+.track-eta-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+/* Map card */
+.track-map-card {
+  display: flex;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  border: 1px solid #e5e7eb;
+  margin-bottom: 24px;
+}
+
+.track-map-visual {
+  width: 120px;
+  min-height: 100px;
+  background: linear-gradient(160deg, #e8f5e9 0%, #c8e6c9 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.track-map-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(90deg, rgba(26,95,55,0.03) 1px, transparent 1px),
+    linear-gradient(rgba(26,95,55,0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.track-map-pin {
+  font-size: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.track-map-info {
+  flex: 1;
+  padding: 16px 18px;
+}
+
+.track-map-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 4px;
+}
+
+.track-map-address {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 10px;
+  line-height: 1.4;
+}
+
+.track-map-directions {
+  display: inline-flex;
+  align-items: center;
+  color: #1a5f37;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.track-map-directions:hover {
+  text-decoration: underline;
+}
+
+/* Status stepper */
+.track-stepper {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 24px;
+  padding: 20px 0;
+  position: relative;
+}
+
+.track-step {
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  font-size: 14px;
-  padding: 20px;
-  color: #454545;
-  border: 1px solid tomato;
-  border-radius: 8px;
+  align-items: center;
+  flex: 1;
+  position: relative;
 }
 
-.order-details {
+.track-step-dot {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  color: #9ca3af;
   display: flex;
-  flex-direction: column;
-  gap: 15px;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+  z-index: 2;
+  transition: all 0.3s ease;
 }
 
-.order-item {
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 10px;
+.track-step.active .track-step-dot {
+  background: #1a5f37;
+  color: white;
+  box-shadow: 0 0 0 4px rgba(26, 95, 55, 0.2);
 }
 
-.order-extras, .order-mandatory, .order-comment {
-  margin-left: 20px;
-  font-size: 14px;
+.track-step.done .track-step-dot {
+  background: #22c55e;
+  color: white;
 }
 
-.order-extras .ex,
-.order-mandatory .mandatory {
-  color: #000;
+.track-step-label {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin-top: 8px;
+  text-align: center;
+  max-width: 70px;
 }
 
-.order-comment {
-  color: #ff4d4d;
-  font-style: italic;
-}
-
-.status-pill {
-  font-weight: bold;
-  padding: 3px 8px;
-  border-radius: 8px;
-  background: #eee;
-  color: #000;
-  display: inline-block;
-}
-
-.gu-bt {
-  border: none;
-  padding: 10px 15px;
-  border-radius: 4px;
-  background-color: #ffe1e1;
-  color: #454545;
+.track-step.active .track-step-label,
+.track-step.done .track-step-label {
+  color: #1f2937;
   font-weight: 500;
-  cursor: pointer;
-  max-width: 200px;
 }
 
-@media (max-width: 768px) {
-  .guest-order {
-    padding: 15px;
-    font-size: 14px;
+.track-step-line {
+  position: absolute;
+  top: 22px;
+  left: calc(50% + 28px);
+  width: calc(100% - 56px);
+  height: 3px;
+  background: #e5e7eb;
+  z-index: 1;
+}
+
+.track-step.done .track-step-line {
+  background: #22c55e;
+}
+
+.track-step:last-child .track-step-line {
+  display: none;
+}
+
+/* Order summary */
+.track-order-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  border: 1px solid #e5e7eb;
+  margin-bottom: 20px;
+}
+
+.track-order-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 16px;
+}
+
+.track-items {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 16px;
+}
+
+.track-item {
+  padding: 10px 0;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 0.95rem;
+}
+
+.track-item:last-child {
+  border-bottom: none;
+}
+
+.track-item-name {
+  display: block;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.track-item-options,
+.track-item-extras {
+  display: block;
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.track-item-note {
+  display: block;
+  font-size: 0.85rem;
+  color: #1a5f37;
+  font-style: italic;
+  margin-top: 4px;
+}
+
+.track-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+/* Refresh button */
+.track-refresh {
+  width: 100%;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 12px;
+  background: #f3f4f6;
+  color: #374151;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.track-refresh:hover:not(:disabled) {
+  background: #e5e7eb;
+}
+
+.track-refresh:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+@media (max-width: 520px) {
+  .guest-track {
+    padding: 16px;
+    margin-top: 90px;
   }
 
-  .order-details {
-    gap: 10px;
+  .track-map-card {
+    flex-direction: column;
   }
 
-  button {
-    font-size: 13px;
+  .track-map-visual {
     width: 100%;
+    min-height: 80px;
+  }
+
+  .track-step-label {
+    font-size: 0.7rem;
+    max-width: 60px;
   }
 }

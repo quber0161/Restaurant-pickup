@@ -5,7 +5,8 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: { type: String, default: "user" },
-    cartData: { type: mongoose.Schema.Types.Mixed, default: {} }, // Store cart data as an object
+    restaurantId: { type: mongoose.Schema.Types.ObjectId, ref: "birdiebiteRestaurant", default: null },
+    cartData: { type: mongoose.Schema.Types.Mixed, default: {} },
 });
 
 const userModel = mongoose.models.user || mongoose.model("user", userSchema);

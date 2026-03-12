@@ -1,153 +1,141 @@
-.order-list{
-    width: 100%;
-}
-.order-item {
-    display: grid;
-    grid-template-columns: 0.5fr 2fr 1fr 1fr 1fr;
-    align-items: start;
-    gap: 30px;
-    border: 2px solid tomato; /* Default border */
-    padding: 20px;
-    margin: 30px 0px;
-    font-size: 14px;
-    /* color: #505050; */
-    transition: border-color 0.3s ease-in-out; /* Smooth color change */
+.order.add {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
 }
 
-.order-item-food, .order-item-name {
-    font-weight: 500;
-    font-size: large;
+.order.add h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--admin-text);
+  margin-bottom: 24px;
+  letter-spacing: -0.02em;
+}
+
+.order-list {
+  width: 100%;
+}
+
+.order-item {
+  display: grid;
+  grid-template-columns: 48px 2fr 1fr;
+  align-items: start;
+  gap: 24px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  font-size: 0.875rem;
+  background: var(--admin-card);
+  border-radius: var(--admin-radius);
+  box-shadow: var(--admin-shadow);
+  border-left: 4px solid var(--admin-border);
+  transition: box-shadow 0.2s;
+}
+
+.order-item:hover {
+  box-shadow: var(--admin-shadow-lg);
+}
+
+.order-item.processing,
+.order-item[style*="Order Processing"] { border-left-color: #ef4444; }
+.order-item.ready,
+.order-item[style*="Ready to Takeaway"] { border-left-color: #f59e0b; }
+.order-item.taken,
+.order-item[style*="Taken"] { border-left-color: #10b981; }
+
+.order-item img {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--admin-radius-sm);
+  object-fit: cover;
+}
+
+.order-item-food,
+.order-item-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--admin-text);
 }
 
 .order-item-name {
-    margin-top: 30px;
-    margin-bottom: 5px;
+  margin-top: 0;
+  margin-bottom: 8px;
 }
 
-.order-item-address {
-    margin-bottom: 10px;
-}
+.order-item-address { margin-bottom: 6px; }
+.order-item p { color: var(--admin-text); }
 
 .order-item select {
-    background-color: #ffe8e4;
-    border: 1px solid tomato;
-    width: max(15vw, 20px);
-    padding: 10px;
-    outline: none;
-}
-
-
-/* Optional: Improve text visibility on light backgrounds */
-.order-item p {
-    color: #000000;
-}
-/* 🟢 Border Colors Based on Status */
-.order-item.processing { border: 2px solid red; }
-.order-item.ready { border: 2px solid orange; }
-.order-item.taken { border: 2px solid green; }
-
-/* 🟢 Center pagination at the bottom */
-.pagination-container {
-    display: flex;
-    justify-content: center; /* Centers it horizontally */
-    width: 100%;
-    margin-top: 20px; /* Adds spacing from last order */
-}
-
-/* 🟢 Style pagination buttons */
-.pagination {
-    display: flex;
-    gap: 10px; /* Space between buttons */
-}
-
-.pagination button {
-    background-color: #ff4d4d;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    font-size: 14px;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-.pagination button:hover {
-    background-color: #e60000;
-}
-
-.pagination button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-
-.pagination span {
-    font-size: 15px;
-    font-weight: bold;
-}
-
-/* 🟢 Ensure pagination is not floating to the right */
-.order.add {
-    display: flex;
-    flex-direction: column; /* Stack items vertically */
-    align-items: center; /* Ensure everything is centered */
-}
-
-/* Extra Ingredients */
-.extras {
-    font-size: 14px;
-    color: #555;
-    font-style: italic;
-}
-
-/* Special Instructions */
-.special-instructions {
-    font-size: 14px;
-    color: #d9534f; /* Reddish color for warnings */
-    font-weight: bold;
-    margin-top: 5px;
-}
-
-.order-details {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+  background: var(--admin-bg);
+  border: 1px solid var(--admin-border);
+  padding: 10px 14px;
+  border-radius: var(--admin-radius-sm);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
 }
 
 .order-item-detail {
-    margin-top: 10px;
-    padding: 5px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #f9f9f9;
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: var(--admin-radius-sm);
+  background: var(--admin-bg);
 }
 
-.order-extras {
-    font-size: 14px;
-    color: #e67e22;
+.order-extras { color: #ea580c; }
+.order-comment { color: #b91c1c; }
+.order-mandatory { color: #0369a1; }
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 28px;
 }
 
-.order-comment {
-    font-size: 14px;
-    color: #c0392b;
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.order-mandatory {
-    font-size: 14px;
-    color: #2980b9; /* Blue color for visibility */
+.pagination button {
+  background: var(--admin-accent);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--admin-radius-sm);
+  transition: background 0.2s;
+}
+
+.pagination button:hover {
+  background: var(--admin-accent-hover);
+}
+
+.pagination button:disabled {
+  background: var(--admin-border);
+  cursor: not-allowed;
+}
+
+.pagination span {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--admin-text-muted);
+}
+
+.order-date {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--admin-text-muted);
+  margin: 24px 0 12px;
+}
+
+@media (max-width: 1000px) {
+  .order-item {
+    grid-template-columns: 40px 1fr 1fr;
+    padding: 16px;
+    font-size: 0.8125rem;
   }
-  
-
-
-@media (max-width:1000px) {
-    .order-item{
-        font-size: 12px;
-        grid-template-columns: 0.5fr 2fr 1fr;
-        padding: 15px 8px;
-    }
-    .order-item select{
-        padding: 5px;
-        font-size: 12px;
-    }
-    .order-item img{
-        width: 40px;
-    }
 }

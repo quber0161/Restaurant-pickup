@@ -41,8 +41,9 @@ const Footer = () => {
           <h2>COMPANY</h2>
           <ul>
             <li>
-              <Link to="/">Home</Link>
+              <Link to="/" className="footer-birdiebite-link">← Return to BirdieBite</Link>
             </li>
+            <li><Link to="/home">Restaurant Home</Link></li>
             <li><Link to="/about">About Us</Link></li>
             <li><Link to="/privacy">Privacy policy</Link></li>
           </ul>

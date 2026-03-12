@@ -17,6 +17,35 @@
     width: 150px;  
 }
 
+/* Explicitly ensure Return to BirdieBite is always visible - overrides template */
+.user-navbar .navbar-back-btn {
+  display: flex !important;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  color: #1a5f37 !important;
+  font-weight: 600;
+  font-size: 1rem !important;
+  text-decoration: none !important;
+  border-radius: 8px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.user-navbar .navbar-back-btn:hover {
+  background: rgba(26, 95, 55, 0.15);
+  color: #0d3d21 !important;
+}
+
+.user-navbar .navbar-back-text {
+  white-space: nowrap;
+  visibility: visible !important;
+}
+
+.user-navbar .birdiebite-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
 .navbar-menu{
     display: flex;
     list-style: none;

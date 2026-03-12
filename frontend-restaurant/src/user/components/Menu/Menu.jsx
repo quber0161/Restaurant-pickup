@@ -25,7 +25,7 @@ const Menu = ({ category, setCategory }) => {
                 className={`category-image ${
                   category === item.name ? "active" : ""
                 }`}
-                src={`${url}/categoryimages/${item.image}`}
+                src={item.image?.startsWith?.("http") ? item.image : `${url}/categoryimages/${item.image}`}
                 alt={item.name}
               />
               <p>{item.name}</p>

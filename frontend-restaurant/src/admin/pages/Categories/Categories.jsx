@@ -2,21 +2,22 @@
 import React, { useState, useEffect } from "react";
 import "./Categories.css";
 import axios from "axios";
-import { toast } from "react-toastify";
 import { assets } from "../../assets/assets";
+import { toast } from "react-toastify";
+import { useOutletContext } from "react-router-dom";
 
 const Categories = () => {
-  const url = "https://restaurant-pickup-1.onrender.com";
-
+  const { url, token, restaurantSlug } = useOutletContext();
   const [categories, setCategories] = useState([]);
   const [newCategoryImage, setNewCategoryImage] = useState(null);
   const [newCategory, setNewCategory] = useState({ name: "" });
+  const [adding, setAdding] = useState(false);
 
-  // ✅ Fetch categories from the backend
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get(`${url}/api/category/list`); // ✅ Fixed API URL
+        const q = restaurantSlug ? `?slug=${restaurantSlug}` : "";
+        const response = await axios.get(`${url}/api/category/list${q}`, { headers: { token } });
         if (response.data.success && Array.isArray(response.data.categories)) {
           setCategories(response.data.categories);
         } else {
@@ -30,7 +31,7 @@ const Categories = () => {
       }
     };
     fetchCategories();
-  }, []);
+  }, [url, token, restaurantSlug]);
 
   // ✅ Handle Input Change
   const onChangeHandler = (event) => {
@@ -39,7 +40,7 @@ const Categories = () => {
     setNewCategory((data) => ({ ...data, [name]: value }));
   };
 
-  // ✅ Add Category Function
+  // Add Category - optimistic update for instant UI
   const onSubmitHandler = async (event) => {
     event.preventDefault();
     if (!newCategory.name.trim() || !newCategoryImage) {
@@ -47,48 +48,69 @@ const Categories = () => {
       return;
     }
 
+    const name = newCategory.name.trim();
+    const imagePreview = URL.createObjectURL(newCategoryImage);
+
+    // Optimistic: show category immediately
+    const tempId = "temp-" + Date.now();
+    setCategories((prev) => [...prev, { _id: tempId, name, image: imagePreview, _optimistic: true }]);
+    setNewCategory({ name: "" });
+    setNewCategoryImage(null);
+    setAdding(true);
+
     const formData = new FormData();
-    formData.append("name", newCategory.name);
+    formData.append("name", name);
     formData.append("image", newCategoryImage);
+    if (restaurantSlug) formData.append("restaurantSlug", restaurantSlug);
 
     try {
-      const response = await axios.post(`${url}/api/category/add`, formData);
+      const response = await axios.post(`${url}/api/category/add`, formData, { headers: { token } });
       if (response.data.success) {
-        setCategories((prev) => [
-          ...prev,
-          {
-            _id: response.data.id,
-            name: newCategory.name,
-            image: response.data.image,
-          },
-        ]);
-        setNewCategory({ name: "" });
-        setNewCategoryImage(null);
-        toast.success("Category added successfully!");
+        const serverImage = response.data.image;
+        const serverId = response.data.id;
+        setCategories((prev) =>
+          prev.map((c) =>
+            c._id === tempId
+              ? { _id: serverId, name, image: serverImage }
+              : c
+          )
+        );
+        URL.revokeObjectURL(imagePreview);
+        toast.success("Category added!");
       } else {
+        setCategories((prev) => prev.filter((c) => c._id !== tempId));
+        URL.revokeObjectURL(imagePreview);
         toast.error(response.data.message);
       }
     } catch (error) {
-      console.error("Error adding category:", error);
+      setCategories((prev) => prev.filter((c) => c._id !== tempId));
+      URL.revokeObjectURL(imagePreview);
       toast.error("Error adding category!");
+    } finally {
+      setAdding(false);
     }
   };
 
-  // ✅ Remove Category Function
+  // Remove Category - optimistic update
   const removeCategory = async (categoryId) => {
+    const isTemp = String(categoryId).startsWith("temp-");
+    setCategories((prev) => prev.filter((cat) => cat._id !== categoryId));
+    if (isTemp) return;
+
     try {
-      const response = await axios.post(`${url}/api/category/remove`, {
-        id: categoryId,
-      });
+      const response = await axios.post(`${url}/api/category/remove`, { id: categoryId }, { headers: { token } });
       if (response.data.success) {
-        setCategories((prev) => prev.filter((cat) => cat._id !== categoryId)); // ✅ Remove from UI
-        toast.success("Category removed successfully!");
+        toast.success("Category removed!");
       } else {
+        setCategories((prev) => [...prev].concat(/* re-add on failure would need stored item */));
         toast.error("Error removing category!");
       }
     } catch (error) {
-      console.error("Error removing category:", error);
       toast.error("Error removing category!");
+      // Refetch to restore correct state
+      const q = restaurantSlug ? `?slug=${restaurantSlug}` : "";
+      const res = await axios.get(`${url}/api/category/list${q}`, { headers: { token } });
+      if (res.data.success) setCategories(res.data.categories || []);
     }
   };
 
@@ -123,7 +145,7 @@ const Categories = () => {
             hidden
             required
           />
-          <button type="submit">Add Category</button>
+          <button type="submit" disabled={adding}>Add Category</button>
         </div>
       </form>
 
@@ -133,7 +155,7 @@ const Categories = () => {
           categories.map((cat) => (
             <li key={cat._id}>
               <img
-                src={`${url}/categoryimages/` + cat.image}
+                src={cat.image?.startsWith?.("http") || cat.image?.startsWith?.("blob:") ? cat.image : `${url}/categoryimages/` + cat.image}
                 alt={cat.name}
                 width="50"
                 height="50"

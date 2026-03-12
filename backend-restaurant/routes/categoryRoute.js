@@ -1,8 +1,7 @@
 import express from "express";
 import multer from "multer";
 import { addCategory, listCategory, removeCategory } from "../controllers/categoryController.js";
-
-
+import { adminAuth, optionalAdminAuth } from "../middleware/adminAuth.js";
 
 const categoryRouter = express.Router();
 
@@ -17,8 +16,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage })
 
-categoryRouter.post("/add", upload.single("image"), addCategory)
-categoryRouter.get("/list", listCategory)
+categoryRouter.post("/add", adminAuth, upload.single("image"), addCategory)
+categoryRouter.get("/list", optionalAdminAuth, listCategory)
 categoryRouter.post("/remove", removeCategory);
 
 

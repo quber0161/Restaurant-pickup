@@ -1,12 +1,13 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import "./Add.css";
 import { assets } from "../../assets/assets";
 import axios from "axios";
 import { toast } from "react-toastify";
 
 const Add = () => {
-  const url = () => "https://restaurant-pickup-1.onrender.com";
+  const { url, token, restaurantSlug } = useOutletContext();
 
   const [image, setImage] = useState(false);
   const [data, setData] = useState({
@@ -18,7 +19,8 @@ const Add = () => {
   });
 
   const [categories, setCategories] = useState([]);
-  const [extraIngredients, setExtraIngredients] = useState([]); // 🟢 Store all available extras
+  const [extraIngredients, setExtraIngredients] = useState([]);
+  const [adding, setAdding] = useState(false);
 
   const [mandatoryOptions, setMandatoryOptions] = useState([]);
   const [optionTitle, setOptionTitle] = useState("");
@@ -29,7 +31,8 @@ const Add = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get(`${url()}/api/category/list`);
+        const q = restaurantSlug ? `?slug=${restaurantSlug}` : "";
+        const response = await axios.get(`${url}/api/category/list${q}`, { headers: { token } });
         if (response.data.success && Array.isArray(response.data.categories)) {
           setCategories(response.data.categories);
         } else {
@@ -43,7 +46,9 @@ const Add = () => {
 
     const fetchExtras = async () => {
       try {
-        const response = await axios.get(`${url()}/api/extras/list`);
+        const slugParam = restaurantSlug ? `?slug=${restaurantSlug}` : "";
+        const headers = token ? { headers: { token } } : {};
+        const response = await axios.get(`${url}/api/extras/list${slugParam}`, headers);
         if (response.data.success) {
           setExtraIngredients(response.data.extras);
         }
@@ -54,7 +59,7 @@ const Add = () => {
 
     fetchCategories();
     fetchExtras();
-  }, []);
+  }, [url, token, restaurantSlug]);
 
   const onChangeHandler = (event) => {
     const { name, value } = event.target;
@@ -73,6 +78,7 @@ const Add = () => {
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
+    setAdding(true);
     const formData = new FormData();
     formData.append("name", data.name);
     formData.append("description", data.description);
@@ -81,26 +87,22 @@ const Add = () => {
     formData.append("image", image);
     formData.append("extras", JSON.stringify(data.extras)); // 🟢 Convert extras to JSON string
     formData.append("mandatoryOptions", JSON.stringify(mandatoryOptions));
-
+    if (restaurantSlug) formData.append("restaurantSlug", restaurantSlug);
 
     try {
-      const response = await axios.post(`${url()}/api/food/add`, formData);
+      const response = await axios.post(`${url}/api/food/add`, formData, { headers: { token } });
       if (response.data.success) {
-        setData({
-          name: "",
-          description: "",
-          price: "",
-          category: "",
-          extras: [],
-        });
+        setData({ name: "", description: "", price: "", category: "", extras: [] });
         setImage(false);
+        setMandatoryOptions([]);
         toast.success(response.data.message);
       } else {
         toast.error(response.data.message);
       }
     } catch (error) {
-      console.error("Error adding food item:", error);
       toast.error("Failed to add food item.");
+    } finally {
+      setAdding(false);
     }
   };
 
@@ -157,7 +159,7 @@ const Add = () => {
               required
             >
               <option value="" disabled>
-                Select categor
+                Select category
               </option>
               {categories.map((cat) => (
                 <option key={cat._id} value={cat.name}>
@@ -299,8 +301,8 @@ const Add = () => {
 
 
 
-        <button type="submit" className="add-button">
-          ADD
+        <button type="submit" className="add-button" disabled={adding}>
+          {adding ? "Adding…" : "ADD"}
         </button>
       </form>
     </div>

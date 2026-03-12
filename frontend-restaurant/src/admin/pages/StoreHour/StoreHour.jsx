@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { useOutletContext } from "react-router-dom";
 import axios from "axios";
 import "./StoreHour.css";
 
@@ -14,7 +15,7 @@ const daysOfWeek = [
 ];
 
 export default function StoreHour() {
-    const url = "https://restaurant-pickup-1.onrender.com";
+  const { url, token, restaurantSlug } = useOutletContext();
 
   const [hours, setHours] = useState([]);
   const [overrides, setOverrides] = useState([]);
@@ -22,28 +23,56 @@ export default function StoreHour() {
 
   useEffect(() => {
     fetchHours();
-  }, []);
+  }, [restaurantSlug]);
 
   const fetchHours = async () => {
-    const res = await axios.get(`${url}/api/store-hours`);
+    const slugParam = restaurantSlug ? `?slug=${restaurantSlug}` : "";
+    const headers = token ? { headers: { token } } : {};
+    const res = await axios.get(`${url}/api/store-hours${slugParam}`, headers);
     const regular = res.data.filter((h) => !h.isOverride);
     const special = res.data.filter((h) => h.isOverride);
     setHours(regular);
     setOverrides(special);
   };
 
-  const updateHour = async (key, field, value, isOverride = false) => {
+  const debounceRef = useRef(null);
+
+  const updateHour = (key, field, value, isOverride = false) => {
     const list = isOverride ? overrides : hours;
     const item = list.find((i) => (isOverride ? i.date : i.day) === key) || {};
-    const payload = {
+    const updated = {
       ...item,
       [field]: value,
       day: isOverride ? item.day : key,
       date: isOverride ? key : undefined,
       isOverride,
     };
-    await axios.post(`${url}/api/store-hours`, payload);
-    fetchHours();
+    // Optimistic update
+    if (isOverride) {
+      setOverrides((prev) =>
+        prev.some((i) => i.date === key)
+          ? prev.map((i) => (i.date === key ? updated : i))
+          : [...prev, updated]
+      );
+    } else {
+      setHours((prev) => {
+        const exists = prev.find((i) => i.day === key);
+        if (exists) return prev.map((i) => (i.day === key ? updated : i));
+        return [...prev, updated];
+      });
+    }
+    // Debounce API call
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(async () => {
+      const payload = { ...updated, restaurantSlug };
+      const headers = token ? { headers: { token } } : {};
+      try {
+        await axios.post(`${url}/api/store-hours`, payload, headers);
+      } catch {
+        fetchHours(); // Restore on error
+      }
+      debounceRef.current = null;
+    }, 400);
   };
 
   const addOverride = async () => {
@@ -51,21 +80,34 @@ export default function StoreHour() {
     const dayName = new Date(overrideDate).toLocaleDateString("en-US", {
       weekday: "long",
     });
-    await axios.post(`${url}/api/store-hours`, {
+    const newOverride = {
       date: overrideDate,
       day: dayName,
       openTime: "13:00",
       closeTime: "23:00",
       isClosed: false,
       isOverride: true,
-    });
+    };
+    setOverrides((prev) => [...prev, newOverride]);
     setOverrideDate("");
-    fetchHours();
+    const headers = token ? { headers: { token } } : {};
+    try {
+      await axios.post(`${url}/api/store-hours`, { ...newOverride, restaurantSlug }, headers);
+    } catch {
+      setOverrideDate(overrideDate);
+      fetchHours();
+    }
   };
 
   const deleteOverride = async (date) => {
-    await axios.delete(`${url}/api/store-hours/override/${date}`);
-    fetchHours();
+    setOverrides((prev) => prev.filter((o) => o.date !== date));
+    const slugParam = restaurantSlug ? `?slug=${restaurantSlug}` : "";
+    const headers = token ? { headers: { token } } : {};
+    try {
+      await axios.delete(`${url}/api/store-hours/override/${date}${slugParam}`, headers);
+    } catch {
+      fetchHours();
+    }
   };
 
   return (

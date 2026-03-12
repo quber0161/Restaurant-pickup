@@ -1,0 +1,82 @@
+.superadmin-login-page {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.superadmin-login-box {
+  width: 100%;
+  max-width: 360px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+}
+
+.superadmin-login-box h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+}
+
+.superadmin-login-box > p {
+  color: #666;
+  margin: 0 0 1.5rem;
+  font-size: 0.9rem;
+}
+
+.superadmin-login-box form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.superadmin-login-box input {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.superadmin-login-box input:focus {
+  outline: none;
+  border-color: #2d7a4f;
+}
+
+.superadmin-login-error {
+  color: #c00;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.superadmin-login-box button {
+  padding: 10px 16px;
+  background: #2d7a4f;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.superadmin-login-box button:hover:not(:disabled) {
+  background: #246840;
+}
+
+.superadmin-login-box button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.superadmin-login-back {
+  display: block;
+  margin-top: 1.5rem;
+  color: #2d7a4f;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.superadmin-login-back:hover {
+  text-decoration: underline;
+}

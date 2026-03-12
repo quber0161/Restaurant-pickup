@@ -1,43 +1,36 @@
 /* eslint-disable no-unused-vars */
 import React, { useContext, useEffect } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { useNavigate, useParams, Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Sidebar from "./components/Sidebar/Sidebar";
-import Add from "./pages/Add/Add";
-import List from "./pages/List/List";
-import Orders from "./pages/Orders/Orders";
-import Categories from "./pages/Categories/Categories";
 import { ToastContainer } from "react-toastify";
 import { StoreContext } from "../user/context/StoreContext";
-import Extras from "./pages/Extras/Extras";
-import StoreHour from "./pages/StoreHour/StoreHour";
 
 const AdminApp = () => {
-  const url = "https://restaurant-pickup-1.onrender.com";
-  const { token, userRole } = useContext(StoreContext);
+  const { url, token, userRole } = useContext(StoreContext);
   const navigate = useNavigate();
+  const { restaurantSlug } = useParams();
 
   useEffect(() => {
     if (!token || userRole !== "admin") {
-      navigate("/"); // Redirect non-admin users
+      navigate("/");
+    } else if (!restaurantSlug) {
+      navigate("/");
     }
-  }, [token, userRole, navigate]);
+  }, [token, userRole, restaurantSlug, navigate]);
+
+  if (!restaurantSlug) return null;
 
   return (
     <div className="admin-container">
       <ToastContainer />
-      <Navbar />
+      <Navbar url={url} token={token} restaurantSlug={restaurantSlug} />
       <hr />
       <div className="app-content">
-        <Sidebar />
-        <Routes>
-          <Route path="/add" element={<Add url={url} />} />
-          <Route path="/list" element={<List url={url} />} />
-          <Route path="/orders" element={<Orders url={url} />} />
-          <Route path="/categories" element={<Categories url={url} />} />
-          <Route path="/extras" element={<Extras url={url} />}/>
-          <Route path="/store-hours" element={<StoreHour url={url} />}/>
-        </Routes>
+        <Sidebar restaurantSlug={restaurantSlug} />
+        <main className="admin-main">
+          <Outlet context={{ url, token, restaurantSlug }} />
+        </main>
       </div>
     </div>
   );

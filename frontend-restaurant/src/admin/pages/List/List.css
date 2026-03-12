@@ -1,49 +1,73 @@
-.list-table-format{
-    display: grid;
-    grid-template-columns: 0.5fr 2fr 1fr 1fr 0.5fr 0.5fr;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 15px;
-    border: 1px solid #cacaca;
-    font-size: 13px;
+.list.add.flex-col {
+  max-width: 100%;
 }
 
-.list-table-format.title{
-    background-color: #f9f9f9;
+.list.add p {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--admin-text);
+  margin-bottom: 20px;
+  letter-spacing: -0.02em;
 }
 
-.list-table-format img{
-    width: 50px;
+.list-table {
+  background: var(--admin-card);
+  border-radius: var(--admin-radius);
+  box-shadow: var(--admin-shadow);
+  overflow: hidden;
 }
+
+.list-table-format {
+  display: grid;
+  grid-template-columns: 56px 2fr 1fr 1fr 1fr 1fr;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 24px;
+  font-size: 0.875rem;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.list-table-format:last-child {
+  border-bottom: none;
+}
+
+.list-table-format.title {
+  background: var(--admin-bg);
+  font-weight: 600;
+  color: var(--admin-text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.list-table-format img {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--admin-radius-sm);
+  object-fit: cover;
+}
+
 .li-button {
-    background: #dc3545;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: 0.3s;
-    width: 80px;
-    height: 30px;
+  border: none;
+  padding: 8px 14px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border-radius: var(--admin-radius-sm);
+  cursor: pointer;
+  transition: opacity 0.2s;
+  color: white;
+  background: #ef4444;
 }
 
-.li-button.sold-out {
-    background: #ffc107;
-    color: black;
+.li-button:hover {
+  opacity: 0.9;
 }
 
-.li-button.available {
-    background: #198754;
-    color: white;
-}
-
-
-@media (max-width:600px) {
-    .list-table-format{
-        grid-template-columns: 1fr 3fr 1fr;
-        gap: 15px;
-    }
-    .list-table-format.title{
-        display: none;
-    }
+@media (max-width: 900px) {
+  .list-table-format {
+    grid-template-columns: 48px 2fr 1fr;
+  }
+  .list-table-format.title b:nth-child(n+4) {
+    display: none;
+  }
 }

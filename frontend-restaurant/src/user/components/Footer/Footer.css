@@ -60,6 +60,11 @@
     text-decoration: underline; /* Optional: Add underline on hover */
 }
 
+.footer-birdiebite-link {
+    color: #2d9d5c !important;
+    font-weight: 600;
+}
+
 
 @media (max-width:750px) {
     .footer-content{
