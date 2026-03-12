@@ -185,7 +185,7 @@ const StoreContextProvider = (props) => {
     try {
       const response = await axios.post(url + "/api/cart/get", {}, { headers: { token } });
   
-      if (response.data.success && response.data.cartData) {
+      if (response.data.success && response.data.cartData && typeof response.data.cartData === "object") {
         let transformedCart = {};
   
         // Fetch extras for current restaurant (or legacy if no slug)
@@ -214,11 +214,13 @@ const StoreContextProvider = (props) => {
   
         setCartItems(transformedCart);
         calculateTotalAmount();
-      } else {
+      } else if (response?.data?.success === false || !response?.data?.cartData) {
         setCartItems({});
       }
+      // On network error (catch): don't overwrite - keep current cartItems
     } catch (error) {
       console.error("❌ Error fetching cart:", error);
+      // Don't overwrite cartItems on fetch failure (e.g. backend sleeping)
     }
   };
   

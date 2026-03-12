@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 const Cart = () => {
   const {
     cartItems,
+    setCartItems,
     food_list,
     removeFromCart,
     getTotalCartAmount,
@@ -16,6 +17,23 @@ const Cart = () => {
     loadCartData,
     restaurantSlug,
   } = useContext(StoreContext);
+
+  // Safety: re-sync guest cart from localStorage on mount (handles stale state)
+  useEffect(() => {
+    if (!token && Object.keys(cartItems).length === 0) {
+      try {
+        const saved = localStorage.getItem("guestCart");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed && typeof parsed === "object" && Object.keys(parsed).length > 0) {
+            setCartItems(parsed);
+          }
+        }
+      } catch (e) {
+        console.error("Failed to restore guest cart", e);
+      }
+    }
+  }, [token]);
 
   const [storeStatus, setStoreStatus] = useState({
     isOpen: false,
