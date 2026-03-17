@@ -1,12 +1,13 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import React, { useContext, useRef } from "react";
+import React, { useContext, useRef, useEffect, useState } from "react";
 import "./Menu.css";
 import { StoreContext } from "../../context/StoreContext";
 
 const Menu = ({ category, setCategory }) => {
   const { url, category_list } = useContext(StoreContext);
   const listRef = useRef(null);
+  const [hasOverflow, setHasOverflow] = useState(false);
 
   const scrollByAmount = (direction) => {
     const node = listRef.current;
@@ -24,6 +25,19 @@ const Menu = ({ category, setCategory }) => {
     });
   };
 
+  useEffect(() => {
+    const node = listRef.current;
+    if (!node) return;
+
+    const checkOverflow = () => {
+      setHasOverflow(node.scrollWidth > node.clientWidth + 1);
+    };
+
+    checkOverflow();
+    window.addEventListener("resize", checkOverflow);
+    return () => window.removeEventListener("resize", checkOverflow);
+  }, [category_list.length]);
+
   return (
     <div className="menu" id="menu">
       <div className="menu-header">
@@ -34,14 +48,16 @@ const Menu = ({ category, setCategory }) => {
       </div>
 
       <div className="menu-list-wrapper">
-        <button
-          type="button"
-          className="menu-scroll-btn menu-scroll-btn-left"
-          aria-label="Scroll categories left"
-          onClick={() => scrollByAmount("left")}
-        >
-          ‹
-        </button>
+        {hasOverflow && (
+          <button
+            type="button"
+            className="menu-scroll-btn menu-scroll-btn-left"
+            aria-label="Scroll categories left"
+            onClick={() => scrollByAmount("left")}
+          >
+            ‹
+          </button>
+        )}
         <div
           className="menu-list"
           role="tablist"
@@ -75,14 +91,16 @@ const Menu = ({ category, setCategory }) => {
             );
           })}
         </div>
-        <button
-          type="button"
-          className="menu-scroll-btn menu-scroll-btn-right"
-          aria-label="Scroll categories right"
-          onClick={() => scrollByAmount("right")}
-        >
-          ›
-        </button>
+        {hasOverflow && (
+          <button
+            type="button"
+            className="menu-scroll-btn menu-scroll-btn-right"
+            aria-label="Scroll categories right"
+            onClick={() => scrollByAmount("right")}
+          >
+            ›
+          </button>
+        )}
       </div>
     </div>
   );
