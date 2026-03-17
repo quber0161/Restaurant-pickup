@@ -9,28 +9,31 @@ const Footer = () => {
     <div className="footer" id="footer">
       <div className="footer-content">
         <div className="footer-content-left">
-          <img src={assets.logo} alt="" />
-          <p>
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. 
-            Tenetur fugiat, odio adipisci rerum dicta non ullam corporis, 
-            iure ea doloremque quisquam pariatur tempora facilis, 
-            assumenda dolorem voluptatum tempore deleniti quo!
-          </p>{" "}
+          <div className="footer-brand">
+            <img className="footer-logo" src={assets.logo} alt="BirdieBite" />
+            <div className="footer-brand-text">
+              <div className="footer-brand-name">BirdieBite</div>
+              <div className="footer-brand-tagline">Modern pickup & delivery</div>
+            </div>
+          </div>
+          <p className="footer-desc">
+            Order from your favorite spot in a few taps. Fresh food, fast pickup, and clear order tracking—no fuss.
+          </p>
           <div className="footer-social-icons">
-            {/* 🟢 Facebook Icon (Replace with your actual Facebook URL) */}
             <a
               href="https://www.facebook.com"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Facebook"
             >
               <img src={assets.facebook_icon} alt="Facebook" />
             </a>
 
-            {/* 🟢 Instagram Icon (Replace with your actual Instagram URL) */}
             <a
               href="https://www.instagram.com"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Instagram"
             >
               <img src={assets.instagram_icon} alt="Instagram" />
             </a>
@@ -38,19 +41,18 @@ const Footer = () => {
         </div>
 
         <div className="footer-content-center">
-          <h2>COMPANY</h2>
+          <h2>Explore</h2>
           <ul>
             <li>
               <Link to="/" className="footer-birdiebite-link">← Return to BirdieBite</Link>
             </li>
-            <li><Link to="/home">Restaurant Home</Link></li>
             <li><Link to="/about">About Us</Link></li>
             <li><Link to="/privacy">Privacy policy</Link></li>
           </ul>
         </div>
 
         <div className="footer-content-right">
-          <h2>GET IN TOUCH</h2>
+          <h2>Contact</h2>
           <ul>
             <li><a href="tel:+4712345">+47 123 45 789</a></li>
             <li><a href="mailto:resto@gmail.com">restauran@email.com</a></li>
@@ -59,7 +61,7 @@ const Footer = () => {
       </div>
       <hr />
       <p className="footer-copyright">
-        Copyright 2025 © All Right Reserved
+        © {new Date().getFullYear()} BirdieBite. All rights reserved.
       </p>
     </div>
   );

@@ -10,7 +10,9 @@ const FoodDisplay = ({ category }) => {
 
     return (
         <div className="food-display" id="food-display">
-            <h2>Top dishes from our restaurant</h2>
+            <div className="food-display-header">
+              <h2>{category === "All" ? "All items" : category}</h2>
+            </div>
             <div className="food-display-list">
                 {food_list.map((item, index) => {
                     if (category==="All" || category === item.category) {

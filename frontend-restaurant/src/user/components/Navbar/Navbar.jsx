@@ -10,8 +10,8 @@ const Navbar = ({setShowLogin}) => {
     const location = useLocation();
     const {getTotalCartAmount,token,setToken,setUserRole,userRole,restaurantSlug} = useContext(StoreContext);
     const navigate = useNavigate();
-
-    const activeNav = location.pathname === "/home" ? "home" : location.pathname === "/menu" || location.pathname.startsWith("/menu/") ? "menu" : location.pathname === "/about" ? "contact-us" : "";
+  
+    const activeNav = location.pathname === "/menu" || location.pathname.startsWith("/menu/") ? "menu" : location.pathname === "/about" ? "contact-us" : "";
 
     const [showMobileMenu, setShowMobileMenu] = useState(false);
 
@@ -21,7 +21,7 @@ const Navbar = ({setShowLogin}) => {
         localStorage.removeItem("role")
         setToken("");
         setUserRole("");
-        navigate("/home")
+        navigate(restaurantSlug ? `/menu/${restaurantSlug}` : "/menu");
     }
     
   return (
@@ -33,7 +33,6 @@ const Navbar = ({setShowLogin}) => {
     
 
         <ul className={`navbar-menu ${showMobileMenu ? 'mobile-visible' : ''}`}>
-            <Link to='/home' onClick={() => setShowMobileMenu(false)} className={activeNav === "home" ? "active" : ""}>home</Link>
             <Link to={restaurantSlug ? `/menu/${restaurantSlug}` : "/menu"} onClick={() => setShowMobileMenu(false)} className={activeNav === "menu" ? "active" : ""}>menu</Link>
             <a href='#footer' onClick={() => setShowMobileMenu(false)} className={activeNav === "contact-us" ? "active" : ""}>contact us</a>
         </ul>

@@ -1,10 +1,25 @@
+.menu-page{
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 96px 16px 0; /* navbar is fixed */
+}
+
+@media (max-width: 480px) {
+  .menu-page {
+    padding-top: 76px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+
 .store-closed-banner {
-  background-color: #ff4d4f;
-  color: white;
-  padding: 12px;
+  background: #fff7ed;
+  color: #9a3412;
+  border: 1px solid rgba(154, 52, 18, 0.18);
+  padding: 12px 14px;
   text-align: center;
-  font-weight: bold;
-  border-radius: 5px;
-  margin-top: 120px;
-  font-size: 18px;
+  font-weight: 600;
+  border-radius: 12px;
+  margin: 0 0 16px;
+  font-size: 14px;
 }

@@ -13,7 +13,6 @@ import AboutUs from "./pages/AboutUs/AboutUs";
 import PrivacyPolicy from "./pages/PrivacyPolicy/PrivacyPolicy";
 import GuestTrack from "./pages/GuestTrack/GuestTrack";
 import BirdieBiteLanding from "./pages/BirdieBiteLanding/BirdieBiteLanding";
-import HomeLanding from "./pages/HomeLanding/HomeLanding";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -42,7 +41,6 @@ function UserApp() {
             <Navbar setShowLogin={setShowLogin} />
             <div className="content-wrap">
               <Routes>
-                <Route path="/home" element={<HomeLanding />} />
                 <Route path="/menu" element={<MenuPage />} />
                 <Route path="/menu/:slug" element={<MenuPage />} />
                 <Route path="/cart" element={<Cart />} />

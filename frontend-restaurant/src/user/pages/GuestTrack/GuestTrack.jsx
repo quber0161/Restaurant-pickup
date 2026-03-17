@@ -77,9 +77,11 @@ const GuestTrack = () => {
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}`;
   };
 
+  const menuPath = restaurantSlug ? `/menu/${restaurantSlug}` : "/menu";
+
   if (loading && !order) return (
     <div className="guest-track">
-      <Link to="/" className="guest-track-back">← Return to BirdieBite</Link>
+      <Link to={menuPath} className="guest-track-back">← Return to menu</Link>
       <div className="track-loading">
         <div className="track-spinner"></div>
         <p>Loading your order...</p>
@@ -89,21 +91,21 @@ const GuestTrack = () => {
 
   if (error) return (
     <div className="guest-track">
-      <Link to="/" className="guest-track-back">← Return to BirdieBite</Link>
+      <Link to={menuPath} className="guest-track-back">← Return to menu</Link>
       <div className="track-error">
         <span className="track-error-icon">❌</span>
         <h3>{error}</h3>
-        <Link to="/" className="track-error-link">Back to BirdieBite</Link>
+        <Link to={menuPath} className="track-error-link">Back to menu</Link>
       </div>
     </div>
   );
 
   if (!order) return (
     <div className="guest-track">
-      <Link to="/" className="guest-track-back">← Return to BirdieBite</Link>
+      <Link to={menuPath} className="guest-track-back">← Return to menu</Link>
       <div className="track-error">
         <h3>No order found.</h3>
-        <Link to="/" className="track-error-link">Back to BirdieBite</Link>
+        <Link to={menuPath} className="track-error-link">Back to menu</Link>
       </div>
     </div>
   );
@@ -113,7 +115,7 @@ const GuestTrack = () => {
 
   return (
     <div className="guest-track">
-      <Link to="/" className="guest-track-back">← Return to BirdieBite</Link>
+      <Link to={menuPath} className="guest-track-back">← Return to menu</Link>
 
       <header className="track-header">
         <h1>Track your order</h1>
