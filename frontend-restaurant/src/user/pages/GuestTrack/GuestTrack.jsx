@@ -8,7 +8,7 @@ import "./GuestTrack.css";
 
 const GuestTrack = () => {
   const { token } = useParams();
-  const { setRestaurantSlug } = useContext(StoreContext);
+  const { setRestaurantSlug, restaurantSlug } = useContext(StoreContext);
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -77,7 +77,8 @@ const GuestTrack = () => {
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}`;
   };
 
-  const menuPath = restaurantSlug ? `/menu/${restaurantSlug}` : "/menu";
+  const effectiveSlug = restaurantSlug || order?.restaurantId?.slug || null;
+  const menuPath = effectiveSlug ? `/menu/${effectiveSlug}` : "/menu";
 
   if (loading && !order) return (
     <div className="guest-track">
