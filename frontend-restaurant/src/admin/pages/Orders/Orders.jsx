@@ -81,6 +81,9 @@ const Orders = () => {
     const socket = io(url);
 
     socket.on("newOrder", (newOrder) => {
+      const orderSlug = newOrder?.restaurantId?.slug;
+      const isForThisRestaurant = restaurantSlug && orderSlug ? orderSlug === restaurantSlug : true;
+      if (!isForThisRestaurant) return;
       showNewOrderNotification(newOrder);
       setOrders((prev) => [newOrder, ...prev]);
     });

@@ -294,8 +294,13 @@ const verifyOrder = async (req, res) => {
 
     try {
       if (success == "true") {
-        const updatedOrder = await orderModel.findByIdAndUpdate(orderId, { payment: true }, { new: true });
-  
+        const updatedOrder = await orderModel.findByIdAndUpdate(orderId, { payment: true }, { new: true })
+          .populate("restaurantId", "name slug");
+
+        if (updatedOrder) {
+          const io = req.app.get("io");
+          if (io) io.emit("newOrder", updatedOrder);
+        }
 
         if (guest && updatedOrder?.email && updatedOrder?.trackingToken) {
           const frontendUrl = process.env.FRONTEND_URL || "https://restaurant-pickup-psi.vercel.app";
