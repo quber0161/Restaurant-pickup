@@ -84,16 +84,13 @@ const Cart = () => {
       ) : (
         <>
           <div className="cart-items">
-            <div className="cart-items-title">
-              <p>Items</p>
-              <p>Title</p>
-              <p>Price</p>
-              <p>Quantity</p>
-              <p>Total</p>
-              <p>Remove</p>
+            <div className="cart-items-header">
+              <span>Item</span>
+              <span>Price</span>
+              <span>Qty</span>
+              <span>Total</span>
+              <span className="cart-header-remove">Remove</span>
             </div>
-            <br />
-            <hr />
             {Object.entries(cartItems).map(([key, cartItem]) => {
               const foodItem = food_list.find(
                 (product) => product._id === cartItem.itemId
@@ -105,88 +102,70 @@ const Cart = () => {
                 (acc, extra) => acc + extra.price * extra.quantity,
                 0
               );
-
-              // Calculate any price adjustment from mandatory options
-              // ✅ WORKING VERSION — using already stored additionalPrice from cart
               const mandatoryOptionCost = Object.values(
                 cartItem.mandatoryOptions || {}
               ).reduce(
                 (sum, option) => sum + (option?.additionalPrice || 0),
                 0
               );
-
-              const totalPrice1 =
+              const unitPrice =
                 foodItem.price + extrasCost + mandatoryOptionCost;
-
-              const totalPrice2 =
-                (foodItem.price + extrasCost + mandatoryOptionCost) *
-                cartItem.quantity;
+              const lineTotal = unitPrice * cartItem.quantity;
 
               return (
-                <div key={key}>
-                  <div className="cart-items-title cart-items-item">
-                    <img src={foodItem.image?.startsWith?.("http") ? foodItem.image : url + "/foodimages/" + foodItem.image} alt="" />
-                    <div>
-                      <p className="item-name">{foodItem.name}</p>
-                      {cartItem.mandatoryOptions && (
+                <div key={key} className="cart-item-card">
+                  <div className="cart-item-top">
+                    <img src={foodItem.image?.startsWith?.("http") ? foodItem.image : url + "/foodimages/" + foodItem.image} alt="" className="cart-item-img" />
+                    <div className="cart-item-info">
+                      <p className="cart-item-name">{foodItem.name}</p>
+                      {cartItem.mandatoryOptions && Object.keys(cartItem.mandatoryOptions).length > 0 && (
                         <p className="cart-mandatory-options">
                           <b>Options:</b>{" "}
                           {Object.entries(cartItem.mandatoryOptions).map(
-                            ([key, selected], index, arr) => {
-                              const label = selected?.label || "Unknown";
-                              const price = selected?.additionalPrice || 0;
+                            ([optKey, selected], idx, arr) => {
+                              const label = selected?.label || "";
+                              const p = selected?.additionalPrice || 0;
                               return (
-                                <span key={key}>
-                                  {key}: {label}{" "}
-                                  {price > 0 ? `(Kr ${price})` : ""}
-                                  {index < arr.length - 1 ? ", " : ""}
+                                <span key={optKey}>
+                                  {optKey}: {label}{p > 0 ? ` (+Kr ${p})` : ""}
+                                  {idx < arr.length - 1 ? ", " : ""}
                                 </span>
                               );
                             }
                           )}
                         </p>
                       )}
-
-                      <p className="cart-extras">
-                        <b>Extras:</b>
-                        {(cartItem.extras || []).map((extra, index) => {
-                          // Find the extra details from food_list
-                          const extraDetails = food_list
-                            .flatMap((f) => f.extras || [])
-                            .find((e) => e._id === extra._id);
-                          const extraName = extraDetails
-                            ? extraDetails.name
-                            : "Unknown Extra";
-                          const extraPrice = extraDetails
-                            ? extraDetails.price
-                            : 0;
-
-                          return (
-                            <span key={extra._id}>
-                              {extraName} x {extra.quantity} (Kr{" "}
-                              {extraPrice * extra.quantity})
-                              {index < (cartItem.extras || []).length - 1 ? ", " : ""}
-                            </span>
-                          );
-                        })}
-                      </p>
+                      {(cartItem.extras || []).length > 0 && (
+                        <p className="cart-extras">
+                          <b>Extras:</b>{" "}
+                          {cartItem.extras.map((extra, idx) => {
+                            const ed = food_list.flatMap((f) => f.extras || []).find((e) => e._id === extra._id);
+                            const nm = ed?.name || "Extra";
+                            const pr = ed?.price || 0;
+                            return (
+                              <span key={extra._id}>
+                                {nm} x{extra.quantity} (Kr {pr * extra.quantity})
+                                {idx < cartItem.extras.length - 1 ? ", " : ""}
+                              </span>
+                            );
+                          })}
+                        </p>
+                      )}
                       {cartItem.comment && (
                         <p className="cart-comment">
                           <b>Note:</b> {cartItem.comment}
                         </p>
                       )}
                     </div>
-                    <p>Kr {totalPrice1}</p>
-                    <p>{cartItem.quantity}</p>
-                    <p>Kr {totalPrice2}</p>
-                    <button
-                      className="remove-button"
-                      onClick={() => removeFromCart(key)}
-                    >
+                  </div>
+                  <div className="cart-item-bottom">
+                    <span className="cart-item-unit">Kr {unitPrice}</span>
+                    <span className="cart-item-qty">{cartItem.quantity}</span>
+                    <span className="cart-item-total">Kr {lineTotal}</span>
+                    <button className="remove-button" onClick={() => removeFromCart(key)}>
                       Remove
                     </button>
                   </div>
-                  <hr />
                 </div>
               );
             })}

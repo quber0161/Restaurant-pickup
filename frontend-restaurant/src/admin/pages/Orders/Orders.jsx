@@ -1,12 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useOutletContext } from "react-router-dom";
 import "./Orders.css";
 import axios from "axios";
 import { io } from "socket.io-client";
 import { toast, ToastContainer } from "react-toastify";
 import notifySound from "../../assets/notify.wav";
+
+// Browsers block sound unless played after a user gesture – pre-load and unlock on first click
+let notifyAudio = null;
+const getNotifyAudio = () => {
+  if (!notifyAudio) notifyAudio = new Audio(notifySound);
+  return notifyAudio;
+};
 
 // Status flow: Order Processing → Accepted → On its way → Taken (Finished)
 const STATUS_FLOW = [
@@ -46,6 +53,27 @@ const Orders = () => {
     }
   };
 
+  const playNotifySound = () => {
+    const audio = getNotifyAudio();
+    audio.currentTime = 0;
+    const p = audio.play();
+    if (p && typeof p.catch === "function") p.catch(() => {});
+  };
+
+  const handleTestNotification = () => {
+    playNotifySound();
+    toast.success("Test notification – if you heard the sound, you're all set!");
+    if ("Notification" in window && Notification.permission === "granted") {
+      new Notification("Test notification", { body: "Sound and desktop notifications are working." });
+    } else if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission().then(() => {
+        if (Notification.permission === "granted") {
+          new Notification("Test notification", { body: "Desktop notifications enabled." });
+        }
+      });
+    }
+  };
+
   useEffect(() => {
     const showNewOrderNotification = (order) => {
       const customerName = order?.address?.firstName && order?.address?.lastName
@@ -55,17 +83,13 @@ const Orders = () => {
       const itemCount = order?.items?.length ?? 0;
 
       toast.success(`New order received! ${customerName} • Kr ${amount}`);
-
-      try {
-        const audio = new Audio(notifySound);
-        audio.play();
-      } catch (_) { /* ignore */ }
+      playNotifySound();
 
       if ("Notification" in window && Notification.permission === "granted") {
         new Notification("New order received!", {
           body: `${customerName} • ${itemCount} item(s) • Kr ${amount}`,
           icon: "/favicon.ico",
-          tag: "new-order",
+          tag: "new-order-" + Date.now(),
           requireInteraction: true,
         });
       }
@@ -82,7 +106,9 @@ const Orders = () => {
 
     socket.on("newOrder", (newOrder) => {
       const orderSlug = newOrder?.restaurantId?.slug;
-      const isForThisRestaurant = restaurantSlug && orderSlug ? orderSlug === restaurantSlug : true;
+      const slugA = (orderSlug || "").toLowerCase();
+      const slugB = (restaurantSlug || "").toLowerCase();
+      const isForThisRestaurant = !slugB || !slugA || slugA === slugB;
       if (!isForThisRestaurant) return;
       showNewOrderNotification(newOrder);
       setOrders((prev) => [newOrder, ...prev]);
@@ -174,7 +200,12 @@ const Orders = () => {
 
   return (
     <div className="admin-orders">
-      <h2>All Orders</h2>
+      <div className="admin-orders-header">
+        <h2>All Orders</h2>
+        <button type="button" className="admin-orders-test-btn" onClick={handleTestNotification} title="Unlock sound – click once before orders come in">
+          🔊 Test notification
+        </button>
+      </div>
 
       <div className="admin-orders-list">
         {paginatedOrders.map((item, index) =>

@@ -440,29 +440,175 @@
     width: 1px;
     height: 18px;
     background: rgba(148, 163, 184, 0.8);
+    flex-shrink: 0;
   }
 
-@media (max-width: 480px) {
+  .popup-footer-btn.primary span {
+    white-space: nowrap;
+  }
+
+/* iPhone & small mobile – compact, centered layout */
+@media (max-width: 430px) {
+  .popup-overlay {
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  .popup {
+    position: relative;
+    width: 100%;
+    max-width: 360px;
+    margin: auto;
+    border-radius: 16px;
+    padding: 16px 16px 24px;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom));
+    max-height: min(85dvh, calc(100dvh - 32px));
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .popup h3 {
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+
+  .popup-header {
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .popup-step-label {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+  }
+
+  .popup-stepper {
+    padding: 3px;
+    gap: 4px;
+  }
+
+  .popup-stepper-item {
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+
+  .popup-stepper-dot {
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+  }
+
+  .popup-step {
+    margin-top: 6px;
+  }
+
+  .mandatory-options {
+    gap: 8px;
+    margin: 8px 0;
+  }
+
+  .mandatory-options > p {
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .mandatory-group {
+    padding: 10px 12px;
+    border-radius: 12px;
+  }
+
+  .mandatory-group > p {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .mandatory-choices {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .mandatory-choices label {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    width: 100%;
+    padding: 10px 12px;
+    background: #fff;
+    border: 1px solid rgba(15, 23, 42, 0.1);
+    border-radius: 10px;
+    box-sizing: border-box;
+    min-height: auto;
+    flex-shrink: 0;
+  }
+
+  .mandatory-choices label:hover {
+    background: #f8fafc;
+    border-color: rgba(15, 23, 42, 0.2);
+  }
+
+  .mandatory-choices input[type="radio"] {
+    flex-shrink: 0;
+    margin: 0;
+    width: 20px;
+    height: 20px;
+  }
+
+  .mandatory-choices label {
+    text-align: left;
+  }
+
+  .popup-footer {
+    flex-direction: column;
+    margin-top: 14px;
+    gap: 10px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(15, 23, 42, 0.06);
+  }
+
+  .popup-footer-btn {
+    width: 100%;
+    height: 48px;
+    font-size: 15px;
+    min-width: 0;
+  }
+
+
+  .ex-p {
+    font-size: 14px;
+    margin-top: 12px;
+  }
+
+  .extra-item {
+    padding: 8px 10px;
+  }
+
+  .quantity-selector {
+    margin-top: 10px;
+  }
+}
+
+@media (max-width: 480px) and (min-width: 431px) {
   .popup {
     width: 94%;
     max-width: 420px;
     margin: 16px auto;
     border-radius: 16px;
     padding: 16px 14px 18px;
-    max-height: min(85vh, calc(100dvh - 32px)); /* Fits iPhone notch & address bar */
+    max-height: min(85vh, calc(100dvh - 32px));
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
-  
+
   .mandatory-group {
     padding: 12px 14px;
   }
-  
+
   .popup-footer {
     flex-wrap: wrap;
     gap: 8px;
   }
-  
+
   .popup-footer-btn {
     min-width: 0;
   }
@@ -511,29 +657,6 @@
     font-weight: 400;
     color: #333;
     cursor: pointer;
-  }
-  
-  /* Stack Size/Spice options vertically on mobile so 100g, mild etc. are all visible */
-  @media (max-width: 430px) {
-    .mandatory-choices {
-      flex-direction: column;
-      gap: 8px;
-      flex-wrap: nowrap;
-    }
-    
-    .mandatory-choices label {
-      width: 100%;
-      padding: 10px 12px;
-      background: #fff;
-      border: 1px solid rgba(15, 23, 42, 0.12);
-      border-radius: 10px;
-      box-sizing: border-box;
-    }
-    
-    .mandatory-choices label:hover {
-      background: #f8fafc;
-      border-color: rgba(15, 23, 42, 0.2);
-    }
   }
   
   .mandatory-choices input[type="radio"] {

@@ -28,7 +28,8 @@ const Navbar = ({setShowLogin}) => {
     <div className='navbar user-navbar'>
         <Link to='/' className="navbar-back-btn" title="Return to BirdieBite - choose another restaurant">
           <span className="birdiebite-icon" aria-hidden>⛳</span>
-          <span className="navbar-back-text">Return to BirdieBite</span>
+          <span className="navbar-back-text navbar-back-full">Return to BirdieBite</span>
+          <span className="navbar-back-text navbar-back-short" aria-hidden>BirdieBite</span>
         </Link>
     
 

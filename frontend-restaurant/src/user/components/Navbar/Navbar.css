@@ -1,15 +1,19 @@
 .navbar {
-    position: fixed; /* Make the navbar fixed */
-    top: 0; /* Stick it to the top */
+    position: fixed;
+    top: 0;
     left: 0;
-    width: 100%; /* Ensure it spans the full width */
-    background-color: white; /* Adjust based on your design */
-    z-index: 1000; /* Ensure it's above other elements */
+    right: 0;
+    width: 100%;
+    background-color: white;
+    z-index: 1000;
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 4%; /* Optional: add a slight shadow */
+    padding: 8px 16px;
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+    box-sizing: border-box;
 }
 
 
@@ -37,8 +41,11 @@
 }
 
 .user-navbar .navbar-back-text {
-  white-space: nowrap;
   visibility: visible !important;
+}
+
+.navbar-back-short {
+  display: none;
 }
 
 .user-navbar .birdiebite-icon {
@@ -203,7 +210,7 @@
     .navbar-menu {
         display: none;
         position: absolute;
-        top: 70px; /* adjust based on navbar height */
+        top: 70px;
         left: 0;
         width: 100%;
         background-color: white;
@@ -221,5 +228,54 @@
     .navbar-menu a {
         margin: 10px 0;
         font-size: 18px;
+    }
+}
+
+/* iPhone & narrow mobile – no overlap, clean layout */
+@media (max-width: 500px) {
+    .navbar {
+        padding: 10px 12px;
+        padding-left: max(12px, env(safe-area-inset-left));
+        padding-right: max(12px, env(safe-area-inset-right));
+        gap: 8px;
+    }
+
+    .user-navbar .navbar-back-btn {
+        flex-shrink: 0;
+        padding: 0.35rem 0.5rem;
+        font-size: 0.85rem !important;
+        max-width: 45%;
+        min-width: 0;
+    }
+
+    .navbar-back-full {
+        display: none !important;
+    }
+
+    .navbar-back-short {
+        display: inline !important;
+    }
+
+    .navbar-right {
+        flex: 1;
+        justify-content: flex-end;
+        gap: 12px;
+        min-width: 0;
+        flex-shrink: 0;
+    }
+
+    .navbar-right img {
+        width: 20px;
+    }
+
+    .navbar-right button {
+        padding: 6px 12px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    .hamburger {
+        font-size: 22px;
+        padding: 4px;
     }
 }

@@ -16,12 +16,37 @@
   min-height: 200px;
 }
 
-.admin-orders h2 {
+.admin-orders-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.admin-orders-header h2 {
+  margin: 0;
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--admin-text, #0f172a);
-  margin-bottom: 24px;
   letter-spacing: -0.02em;
+}
+
+.admin-orders-test-btn {
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #7dd3fc;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.admin-orders-test-btn:hover {
+  background: #bae6fd;
 }
 
 .admin-orders-date {
