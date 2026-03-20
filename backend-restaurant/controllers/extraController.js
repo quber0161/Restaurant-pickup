@@ -2,14 +2,14 @@ import extraModel from "../models/extraModel.js";
 import birdiebiteRestaurantModel from "../models/birdiebiteRestaurantModel.js";
 
 // Resolve restaurantId from slug or admin token
+// Prefer slug when explicitly provided (URL context) so admin always gets correct restaurant's data
 const resolveRestaurantId = async (req) => {
-    if (req.adminRestaurantId) return req.adminRestaurantId;
     const slug = req.query.slug || req.body.slug || req.body.restaurantSlug;
     if (slug) {
         const restaurant = await birdiebiteRestaurantModel.findOne({ slug: slug.trim().toLowerCase() });
-        return restaurant?._id || null;
+        if (restaurant) return restaurant._id;
     }
-    return null;
+    return req.adminRestaurantId || null;
 };
 
 // Add Extra Ingredient (per restaurant)

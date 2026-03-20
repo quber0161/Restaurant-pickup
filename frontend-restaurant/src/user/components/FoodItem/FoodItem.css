@@ -449,6 +449,22 @@
     margin: 16px auto;
     border-radius: 16px;
     padding: 16px 14px 18px;
+    max-height: min(85vh, calc(100dvh - 32px)); /* Fits iPhone notch & address bar */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .mandatory-group {
+    padding: 12px 14px;
+  }
+  
+  .popup-footer {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .popup-footer-btn {
+    min-width: 0;
   }
 }
 
@@ -490,11 +506,34 @@
   .mandatory-choices label {
     display: flex;
     align-items: center;
-    gap: 2px;
+    gap: 6px;
     font-size: 14px;
     font-weight: 400;
     color: #333;
     cursor: pointer;
+  }
+  
+  /* Stack Size/Spice options vertically on mobile so 100g, mild etc. are all visible */
+  @media (max-width: 430px) {
+    .mandatory-choices {
+      flex-direction: column;
+      gap: 8px;
+      flex-wrap: nowrap;
+    }
+    
+    .mandatory-choices label {
+      width: 100%;
+      padding: 10px 12px;
+      background: #fff;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      border-radius: 10px;
+      box-sizing: border-box;
+    }
+    
+    .mandatory-choices label:hover {
+      background: #f8fafc;
+      border-color: rgba(15, 23, 42, 0.2);
+    }
   }
   
   .mandatory-choices input[type="radio"] {

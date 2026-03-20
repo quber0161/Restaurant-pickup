@@ -45,21 +45,22 @@ const GuestTrack = () => {
     fetchOrder();
   }, [fetchOrder]);
 
-  const STATUS_FLOW = [
-    { key: "Order Processing", label: "Preparing your order", icon: "📦" },
-    { key: "Ready to Takeaway", label: "Ready for pickup", icon: "✅" },
-    { key: "Taken", label: "Collected", icon: "🎉" },
-  ];
-
   const getStatusIndex = () => {
-    const idx = STATUS_FLOW.findIndex((s) => s.key === (order?.status || "Order Processing"));
-    return idx >= 0 ? idx : 0;
+    const status = order?.status || "Order Processing";
+    const map = {
+      "Order Processing": 0,
+      "Accepted": 1,
+      "On its way": 2,
+      "Ready to Takeaway": 2,
+      "Taken": 3,
+    };
+    return map[status] ?? 0;
   };
 
   const getEstimatedTime = () => {
     const status = order?.status || "Order Processing";
     const deliveryTime = order?.restaurantId?.deliveryTime;
-    if (status === "Ready to Takeaway") return "Ready now!";
+    if (status === "On its way" || status === "Ready to Takeaway") return "Ready soon!";
     if (status === "Taken") return "Order collected";
     return deliveryTime || "~15–25 min";
   };
@@ -151,17 +152,20 @@ const GuestTrack = () => {
         </div>
       )}
 
-      {/* Status stepper */}
+      {/* Status stepper – show 4 main steps (Received → Preparing → On its way → Collected) */}
       <div className="track-stepper">
-        {STATUS_FLOW.map((step, i) => (
-          <div key={step.key} className={`track-step ${i <= statusIndex ? "active" : ""} ${i < statusIndex ? "done" : ""}`}>
-            <div className="track-step-dot">
-              {i < statusIndex ? "✓" : step.icon}
+        {["Order received", "Preparing", "On its way", "Collected"].map((label, i) => {
+          const isActive = i <= statusIndex;
+          const isDone = i < statusIndex;
+          const icons = ["📦", "👨‍🍳", "🚀", "🎉"];
+          return (
+            <div key={label} className={`track-step ${isActive ? "active" : ""} ${isDone ? "done" : ""}`}>
+              <div className="track-step-dot">{isDone ? "✓" : icons[i]}</div>
+              <span className="track-step-label">{label}</span>
+              {i < 3 && <div className="track-step-line" />}
             </div>
-            <span className="track-step-label">{step.label}</span>
-            {i < STATUS_FLOW.length - 1 && <div className="track-step-line" />}
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Order summary */}

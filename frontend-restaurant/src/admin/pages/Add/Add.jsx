@@ -45,15 +45,19 @@ const Add = () => {
     };
 
     const fetchExtras = async () => {
+      if (!url || !restaurantSlug) return;
       try {
-        const slugParam = restaurantSlug ? `?slug=${restaurantSlug}` : "";
+        const slugParam = `?slug=${restaurantSlug}`;
         const headers = token ? { headers: { token } } : {};
         const response = await axios.get(`${url}/api/extras/list${slugParam}`, headers);
-        if (response.data.success) {
+        if (response.data.success && Array.isArray(response.data.extras)) {
           setExtraIngredients(response.data.extras);
+        } else {
+          setExtraIngredients([]);
         }
       } catch (error) {
         console.error("Error fetching extras:", error);
+        setExtraIngredients([]);
       }
     };
 

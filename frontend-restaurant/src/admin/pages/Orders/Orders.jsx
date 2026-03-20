@@ -4,21 +4,30 @@ import React, { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import "./Orders.css";
 import axios from "axios";
-import { assets } from "../../assets/assets";
 import { io } from "socket.io-client";
 import { toast, ToastContainer } from "react-toastify";
-//import "react-toastify/dist/ReactToastify.css";
 import notifySound from "../../assets/notify.wav";
-import { findPrinters, printOrder } from "../../utils/qzPrinter";
 
-// eslint-disable-next-line react/prop-types
+// Status flow: Order Processing → Accepted → On its way → Taken (Finished)
+const STATUS_FLOW = [
+  { key: "Order Processing", label: "Accept", next: "Accepted" },
+  { key: "Accepted", label: "On its way", next: "On its way" },
+  { key: "Ready to Takeaway", label: "On its way", next: "On its way" }, // backwards compat
+  { key: "On its way", label: "Finished", next: "Taken" },
+  { key: "Taken", label: "Finished", next: null },
+];
+
 const Orders = () => {
   const { url, token, restaurantSlug } = useOutletContext();
   const [orders, setOrders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [expandedOrders, setExpandedOrders] = useState({});
   const ordersPerPage = 10;
 
-  // Fetch orders from backend (admin token filters to their restaurant)
+  const toggleExpand = (orderId) => {
+    setExpandedOrders((prev) => ({ ...prev, [orderId]: !prev[orderId] }));
+  };
+
   const fetchAllOrders = async () => {
     try {
       const slugParam = restaurantSlug ? `?slug=${restaurantSlug}` : "";
@@ -38,31 +47,42 @@ const Orders = () => {
   };
 
   useEffect(() => {
+    const showNewOrderNotification = (order) => {
+      const customerName = order?.address?.firstName && order?.address?.lastName
+        ? `${order.address.firstName} ${order.address.lastName}`
+        : "A customer";
+      const amount = order?.amount ?? 0;
+      const itemCount = order?.items?.length ?? 0;
+
+      toast.success(`New order received! ${customerName} • Kr ${amount}`);
+
+      try {
+        const audio = new Audio(notifySound);
+        audio.play();
+      } catch (_) { /* ignore */ }
+
+      if ("Notification" in window && Notification.permission === "granted") {
+        new Notification("New order received!", {
+          body: `${customerName} • ${itemCount} item(s) • Kr ${amount}`,
+          icon: "/favicon.ico",
+          tag: "new-order",
+          requireInteraction: true,
+        });
+      }
+    };
+
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+
     fetchAllOrders();
 
-    // Polling (optional)
     const interval = setInterval(fetchAllOrders, 5000);
-
-    // Real-time listener via socket
     const socket = io(url);
 
-    socket.on("newOrder", async (newOrder) => {
-      // 🎵 Play notification sound
-      const audio = new Audio(notifySound);
-      audio.play();
-
-      // 🔔 Toastify notification
-      toast.success(`New order received!`);
-
-      // 📦 Add new order to top of list
+    socket.on("newOrder", (newOrder) => {
+      showNewOrderNotification(newOrder);
       setOrders((prev) => [newOrder, ...prev]);
-
-      // // Print order
-      // await printOrder(newOrder, "Your Printer Name");
-
-      // // You can fetch printer names using
-      // const printers = await findPrinters();
-      // console.log(printers); // choose from list
     });
 
     return () => {
@@ -71,202 +91,249 @@ const Orders = () => {
     };
   }, [url, token, restaurantSlug]);
 
-  //
-
-  // Change order status
-  const statusHandler = async (event, orderId) => {
-    const response = await axios.post(url + "/api/order/status", {
-      orderId,
-      status: event.target.value,
-    }, token ? { headers: { token } } : {});
-    if (response.data.success) {
-      await fetchAllOrders();
+  const statusHandler = async (newStatus, orderId) => {
+    try {
+      const response = await axios.post(
+        url + "/api/order/status",
+        { orderId, status: newStatus },
+        token ? { headers: { token } } : {}
+      );
+      if (response.data.success) {
+        await fetchAllOrders();
+      }
+    } catch (err) {
+      toast.error("Failed to update status");
     }
   };
 
-  // Group orders by date
-  const groupOrdersByDate = () => {
-    const groupedOrders = {};
+  const getNextAction = (status) => {
+    const step = STATUS_FLOW.find((s) => s.key === status);
+    if (!step || !step.next) return null;
+    return { label: step.label, nextStatus: step.next };
+  };
 
+  const getStatusPillLabel = (status) => {
+    if (status === "Taken") return "Finished";
+    if (status === "On its way") return "On its way";
+    if (status === "Accepted" || status === "Ready to Takeaway") return "Accepted";
+    return "New";
+  };
+
+  const getShortName = (firstName, lastName) => {
+    const first = firstName || "";
+    const last = (lastName || "").charAt(0);
+    return last ? `${first} ${last}.` : first || "Customer";
+  };
+
+  const formatTime = (dateStr) => {
+    const d = new Date(dateStr);
+    return d.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+  };
+
+  const groupOrdersByDate = () => {
+    const grouped = {};
     orders.forEach((order) => {
-      const orderDate = new Date(order.date).toLocaleDateString("en-US", {
+      const date = new Date(order.date).toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric",
       });
-
-      if (!groupedOrders[orderDate]) {
-        groupedOrders[orderDate] = [];
-      }
-      groupedOrders[orderDate].push(order);
+      if (!grouped[date]) grouped[date] = [];
+      grouped[date].push(order);
     });
-
-    // Sort orders within each date from recent to old
-    Object.keys(groupedOrders).forEach((date) => {
-      groupedOrders[date].sort((a, b) => new Date(b.date) - new Date(a.date));
+    Object.keys(grouped).forEach((d) => {
+      grouped[d].sort((a, b) => new Date(b.date) - new Date(a.date));
     });
-
-    return Object.entries(groupedOrders).sort(
+    return Object.entries(grouped).sort(
       (a, b) => new Date(b[0]) - new Date(a[0])
     );
   };
 
-  // Flatten grouped orders for pagination
   const flattenGroupedOrders = () => {
-    const groupedOrders = groupOrdersByDate();
-    let allOrders = [];
-
-    groupedOrders.forEach(([date, orders]) => {
-      allOrders.push({ isDateHeader: true, date });
-      allOrders.push(...orders);
+    const grouped = groupOrdersByDate();
+    let flat = [];
+    grouped.forEach(([date, ords]) => {
+      flat.push({ isDateHeader: true, date });
+      flat.push(...ords);
     });
-
-    return allOrders;
+    return flat;
   };
 
   const allOrders = flattenGroupedOrders();
-
-  // Get paginated orders
   const paginatedOrders = allOrders.slice(
     (currentPage - 1) * ordersPerPage,
     currentPage * ordersPerPage
   );
 
-  // Change background color based on order status
-  const getStatusBackgroundColor = (status) => {
-    switch (status) {
-      case "Order Processing":
-        return "#f8d7da";
-      case "Ready to Takeaway":
-        return "#fff3cd";
-      case "Taken":
-        return "#d4edda";
-      default:
-        return "#f8f9fa";
-    }
-  };
-
   return (
-    <div className="order add">
+    <div className="admin-orders">
       <h2>All Orders</h2>
-      <div className="order-list">
-        {paginatedOrders.map((order, index) =>
-          order.isDateHeader ? (
-            <h4 key={index} className="order-date">
-              {order.date}
+
+      <div className="admin-orders-list">
+        {paginatedOrders.map((item, index) =>
+          item.isDateHeader ? (
+            <h4 key={`d-${index}`} className="admin-orders-date">
+              {item.date}
             </h4>
           ) : (
-            <div
-              key={index}
-              className={`order-item ${order.status === "Order Processing" ? "processing" : order.status === "Ready to Takeaway" ? "ready" : "taken"}`}
-              style={{
-                backgroundColor: getStatusBackgroundColor(order.status),
-              }}
-            >
-              <img src={assets.parcel_icon} alt="Parcel" />
-
-              <div className="order-details">
-                <p>
-                  <b>Customer:</b> {order.address.firstName}{" "}
-                  {order.address.lastName}
-                </p>
-                <p>
-                  <b>Address:</b> {order.address.houseNo},{" "}
-                  {order.address.street}, {order.address.zipCode}
-                </p>
-                <p>
-                  <b>Phone:</b> {order.address.phone}
-                </p>
-                <p>
-                  <b>Total Items:</b> {order.items.length}
-                </p>
-                <p>
-                  <b>Total Amount:</b> Kr {order.amount}.00
-                </p>
-
-                {/* 🟢 Show Order Items with Extras */}
-                {order.items.map((item, idx) => (
-                  <div key={idx} className="order-item-detail">
-                    <p>
-                      <b>
-                        {item.name} x {item.quantity}
-                      </b>
-                    </p>
-
-                    {/* ✅ Mandatory Options */}
-                    {item.mandatoryOptions &&
-                      Object.keys(item.mandatoryOptions).length > 0 && (
-                        <p className="order-mandatory">
-                          <b>Options:</b>{" "}
-                          {Object.entries(item.mandatoryOptions)
-                            .map(([key, value]) => {
-                              const label = value?.label || "Unknown";
-                              const extra =
-                                value?.additionalPrice > 0
-                                  ? `(+Kr ${value.additionalPrice})`
-                                  : "";
-                              return `${key}: ${label} ${extra}`.trim();
-                            })
-                            .join(", ")}
-                        </p>
-                      )}
-
-                    {/* Extras */}
-                    {Array.isArray(item.extras) && item.extras.length > 0 && (
-                      <p className="order-extras">
-                        <b>Extras:</b>{" "}
-                        {item.extras
-                          .map(
-                            (extra) => `${extra.name} x ${extra.quantity || 1}`
-                          )
-                          .join(", ")}
-                      </p>
-                    )}
-
-                    {/* Comment */}
-                    {item.comment && (
-                      <p className="order-comment">
-                        <b>Note:</b> {item.comment}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              <select
-                onChange={(event) => statusHandler(event, order._id)}
-                value={order.status}
-              >
-                <option value="Order Processing">Order Processing</option>
-                <option value="Ready to Takeaway">Ready to Takeaway</option>
-                <option value="Taken">Taken</option>
-              </select>
-            </div>
+            <OrderCard
+              key={item._id}
+              order={item}
+              expanded={expandedOrders[item._id]}
+              onToggleExpand={() => toggleExpand(item._id)}
+              onStatusChange={statusHandler}
+              getNextAction={getNextAction}
+              getStatusPillLabel={getStatusPillLabel}
+              getShortName={getShortName}
+              formatTime={formatTime}
+            />
           )
         )}
       </div>
 
-      {/* Pagination */}
-      <div className="pagination-container">
-      <div className="pagination">
+      <div className="admin-orders-pagination">
         <button
           disabled={currentPage === 1}
-          onClick={() => setCurrentPage(currentPage - 1)}
+          onClick={() => setCurrentPage((p) => p - 1)}
         >
           Previous
         </button>
         <span>Page {currentPage}</span>
         <button
           disabled={currentPage * ordersPerPage >= allOrders.length}
-          onClick={() => setCurrentPage(currentPage + 1)}
+          onClick={() => setCurrentPage((p) => p + 1)}
         >
           Next
         </button>
       </div>
-      </div>
+
       <ToastContainer position="top-right" autoClose={5000} />
     </div>
   );
 };
+
+// Modern order card component
+function OrderCard({
+  order,
+  expanded,
+  onToggleExpand,
+  onStatusChange,
+  getNextAction,
+  getStatusPillLabel,
+  getShortName,
+  formatTime,
+}) {
+  const addr = order.address || {};
+  const shortId = order._id ? order._id.slice(-4) : "—";
+  const totalItems = order.items?.length || 0;
+  const totalAmount = order.amount ?? 0;
+  const nextAction = getNextAction(order.status);
+  const isFinished = order.status === "Taken";
+
+  return (
+    <div className={`admin-order-card ${isFinished ? "finished" : ""}`}>
+      {/* Header */}
+      <div className="admin-order-card-header">
+        <span className="admin-order-id">#{shortId}</span>
+        <span className="admin-order-customer">
+          {getShortName(addr.firstName, addr.lastName)}
+        </span>
+        <div className="admin-order-meta">
+          <span className="admin-order-time">{formatTime(order.date)}</span>
+        </div>
+      </div>
+
+      <div className="admin-order-type">
+        <span className="admin-order-type-pill">Pickup</span>
+      </div>
+
+      {/* Summary & expand */}
+      <div className="admin-order-summary-row">
+        <span>
+          {totalItems} {totalItems === 1 ? "item" : "items"} • Kr {totalAmount}
+        </span>
+        <button
+          type="button"
+          className="admin-order-expand-btn"
+          onClick={onToggleExpand}
+          aria-label={expanded ? "Collapse items" : "Expand items"}
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            style={{ transform: expanded ? "rotate(180deg)" : "none" }}
+          >
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Items list */}
+      {expanded && (
+        <div className="admin-order-items">
+          {order.items?.map((item, idx) => (
+            <div key={idx} className="admin-order-item-row">
+              <span className="admin-order-item-qty">{item.quantity} ×</span>
+              <div className="admin-order-item-details">
+                <span className="admin-order-item-name">{item.name}</span>
+                {item.mandatoryOptions &&
+                  Object.keys(item.mandatoryOptions).length > 0 && (
+                    <span className="admin-order-item-options">
+                      {Object.entries(item.mandatoryOptions)
+                        .map(([k, v]) => `${k}: ${v?.label || ""}`)
+                        .join(", ")}
+                    </span>
+                  )}
+                {Array.isArray(item.extras) && item.extras.length > 0 && (
+                  <span className="admin-order-item-extras">
+                    + {item.extras.map((e) => `${e.name} x${e.quantity || 1}`).join(", ")}
+                  </span>
+                )}
+                {item.comment && (
+                  <span className="admin-order-item-note">Note: {item.comment}</span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Address & contact when expanded */}
+      {expanded && (
+        <div className="admin-order-address-block">
+          <p><strong>Address:</strong> {addr.houseNo}, {addr.street}, {addr.zipCode}</p>
+          <p><strong>Phone:</strong> {addr.phone}</p>
+        </div>
+      )}
+
+      {/* Actions */}
+      <div className="admin-order-actions">
+        {nextAction && !isFinished ? (
+          <>
+            <button
+              type="button"
+              className="admin-order-btn primary"
+              onClick={() => onStatusChange(nextAction.nextStatus, order._id)}
+            >
+              {nextAction.label}
+            </button>
+          </>
+        ) : (
+          <span className="admin-order-status-pill finished">
+            {getStatusPillLabel(order.status)}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default Orders;

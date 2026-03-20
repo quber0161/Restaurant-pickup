@@ -113,9 +113,15 @@
   background-color: #fceeee;
 }
 
+.my-orders-order[data-status="Accepted"],
 .my-orders-order[data-status="Ready to Takeaway"] {
   border-left-color: #fce79b;
   background-color: #fffceb;
+}
+
+.my-orders-order[data-status="On its way"] {
+  border-left-color: #93c5fd;
+  background-color: #dbeafe;
 }
 
 .my-orders-order[data-status="Taken"] {
@@ -164,9 +170,14 @@
 .my-orders-order[data-status="Taken"] .status-pill {
   background: #28a745;
 }
+.my-orders-order[data-status="Accepted"] .status-pill,
 .my-orders-order[data-status="Ready to Takeaway"] .status-pill {
   background: #ffc107;
   color: #000;
+}
+.my-orders-order[data-status="On its way"] .status-pill {
+  background: #2563eb;
+  color: white;
 }
 .my-orders-order[data-status="Order Processing"] .status-pill {
   background: #dc3545;

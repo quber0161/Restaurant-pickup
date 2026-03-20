@@ -94,13 +94,24 @@ const MyOrders = () => {
     switch (status) {
       case "Order Processing":
         return "#f8d7da"; // 🔴 Light Red
+      case "Accepted":
       case "Ready to Takeaway":
         return "#fff3cd"; // 🟡 Light Yellow
+      case "On its way":
+        return "#dbeafe"; // 🔵 Light Blue
       case "Taken":
         return "#d4edda"; // 🟢 Light Green
       default:
         return "#f8f9fa"; // Light Gray
     }
+  };
+
+  const getStatusLabel = (status) => {
+    if (status === "Taken") return "Finished";
+    if (status === "On its way") return "On its way";
+    if (status === "Accepted") return "Accepted";
+    if (status === "Ready to Takeaway") return "Ready";
+    return status;
   };
 
   return (
@@ -116,6 +127,7 @@ const MyOrders = () => {
             <div
               key={index}
               className="my-orders-order"
+              data-status={order.status}
               style={{
                 backgroundColor: getStatusBackgroundColor(order.status),
               }}
@@ -175,8 +187,7 @@ const MyOrders = () => {
                 <b>Items:</b> {order.items.length}
               </p>
               <p>
-                <span>&#x25cf;</span> <span className="status-pill">{order.status}</span>
-
+                <span>&#x25cf;</span> <span className="status-pill">{getStatusLabel(order.status)}</span>
               </p>
               <button onClick={fetchOrders}>Track Order</button>
             </div>

@@ -9,27 +9,35 @@ import { toast } from "react-toastify";
 const Extras = () => {
   const { url, token, restaurantSlug } = useOutletContext();
   const [extras, setExtras] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [newExtra, setNewExtra] = useState({ name: "", price: "" });
 
   // Fetch extras for this restaurant only
   const fetchExtras = async () => {
+    if (!url || !restaurantSlug) return;
+    setLoading(true);
     try {
-      const slugParam = restaurantSlug ? `?slug=${restaurantSlug}` : "";
+      const slugParam = `?slug=${restaurantSlug}`;
       const headers = token ? { headers: { token } } : {};
       const response = await axios.get(`${url}/api/extras/list${slugParam}`, headers);
       if (response.data.success) {
-        setExtras(response.data.extras);
+        setExtras(Array.isArray(response.data.extras) ? response.data.extras : []);
       } else {
         toast.error("Error fetching extras");
+        setExtras([]);
       }
     } catch (error) {
       console.error("Error fetching extras:", error);
+      toast.error("Failed to load extra ingredients");
+      setExtras([]);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchExtras();
-  }, [restaurantSlug]);
+  }, [url, token, restaurantSlug]);
 
   // 🟢 Handle input changes
   const onChangeHandler = (event) => {
@@ -117,7 +125,9 @@ const Extras = () => {
 
       {/* 🟢 Display Extras */}
       <ul>
-        {extras.length > 0 ? (
+        {loading ? (
+          <p>Loading extra ingredients...</p>
+        ) : extras.length > 0 ? (
           extras.map((extra) => (
             <li className="ex-li" key={extra._id}>
               <p>{extra.name} - Kr {extra.price}</p>
@@ -125,7 +135,7 @@ const Extras = () => {
             </li>
           ))
         ) : (
-          <p>Loading extra ingredients...</p>
+          <p>No extra ingredients yet. Add one above.</p>
         )}
       </ul>
     </div>
